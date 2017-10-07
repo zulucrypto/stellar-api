@@ -6,8 +6,13 @@ namespace ZuluCrypto\StellarSdk\Horizon;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ServerException;
 use ZuluCrypto\StellarSdk\Horizon\Api\HorizonResponse;
 use ZuluCrypto\StellarSdk\Model\Account;
+use ZuluCrypto\StellarSdk\Model\Effect;
+use ZuluCrypto\StellarSdk\Model\Ledger;
+use ZuluCrypto\StellarSdk\Model\Operation;
+use ZuluCrypto\StellarSdk\Model\Payment;
 use ZuluCrypto\StellarSdk\Transaction\TransactionBuilder;
 use ZuluCrypto\StellarSdk\Util\Hash;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
@@ -45,6 +50,21 @@ class ApiClient
         return $apiClient;
     }
 
+    /**
+     * @return ApiClient
+     */
+    public static function newPublicClient()
+    {
+        $apiClient = new ApiClient('https://horizon.stellar.org/');
+
+        return $apiClient;
+    }
+
+    /**
+     * ApiClient constructor.
+     *
+     * @param $baseUrl string root URL of the horizon server, such as https://horizon-testnet.stellar.org/
+     */
     public function __construct($baseUrl)
     {
         $this->baseUrl = $baseUrl;
@@ -53,6 +73,10 @@ class ApiClient
         ]);
     }
 
+    /**
+     * @param TransactionBuilder $transactionBuilder
+     * @return string
+     */
     public function hash(TransactionBuilder $transactionBuilder)
     {
         $passphrase = ($this->isTestnet) ? self::NETWORK_PASSPHRASE_TEST : self::NETWORK_PASSPHRASE_PUBLIC;
@@ -65,6 +89,13 @@ class ApiClient
         return Hash::generate($hashedValue);
     }
 
+    /**
+     * Submits the transaction contained in the TransactionBuilder to the network
+     *
+     * @param TransactionBuilder $transactionBuilder
+     * @param                    $signingAccountSeedString
+     * @return HorizonResponse
+     */
     public function submitTransaction(TransactionBuilder $transactionBuilder, $signingAccountSeedString)
     {
         $transactionEnvelope = $transactionBuilder->sign($signingAccountSeedString);
@@ -128,51 +159,207 @@ class ApiClient
         return new HorizonResponse($apiResponse->getBody());
     }
 
+    /**
+     * Streams Effect objects to $callback
+     *
+     * $callback should have arguments:
+     *  Effect
+     *
+     * For example:
+
+        $client = ApiClient::newPublicClient();
+        $client->streamEffects(null, function(Effect $effect) {
+            printf('Effect type: %s' . PHP_EOL, $effect->getType());
+        });
+     *
+     * @param null $sinceCursor
+     * @param callable $callback
+     */
+    public function streamEffects($sinceCursor = 'now', callable $callback = null)
+    {
+        $url = sprintf('/effects');
+        $params = [];
+
+        if ($sinceCursor) $params['cursor'] = $sinceCursor;
+
+        if ($params) {
+            $url .= '?' . http_build_query($params);
+        }
+
+        $this->getAndStream($url, function($rawData) use ($callback) {
+            $parsedObject = Effect::fromRawResponseData($rawData);
+            $parsedObject->setApiClient($this);
+
+            $callback($parsedObject);
+        });
+    }
+
+    /**
+     * Streams Ledger objects to $callback
+     *
+     * $callback should have arguments:
+     *  Ledger
+     *
+     * For example:
+
+        $client = ApiClient::newPublicClient();
+        $client->streamLedgers(null, function(Ledger $ledger) {
+            printf('[%s] Closed %s at %s with %s operations' . PHP_EOL,
+                (new \DateTime())->format('Y-m-d h:i:sa'),
+                $ledger->getId(),
+                $ledger->getClosedAt()->format('Y-m-d h:i:sa'),
+                $ledger->getOperationCount()
+            );
+        });
+     *
+     * @param null $sinceCursor
+     * @param callable $callback
+     */
+    public function streamLedgers($sinceCursor = 'now', callable $callback = null)
+    {
+        $url = sprintf('/ledgers');
+        $params = [];
+
+        if ($sinceCursor) $params['cursor'] = $sinceCursor;
+
+        if ($params) {
+            $url .= '?' . http_build_query($params);
+        }
+
+        $this->getAndStream($url, function($rawData) use ($callback) {
+            $parsedObject = Ledger::fromRawResponseData($rawData);
+            $parsedObject->setApiClient($this);
+
+            $callback($parsedObject);
+        });
+    }
+
+    /**
+     * Streams Operation objects to $callback
+     *
+     * $callback should have arguments:
+     *  Operation
+     *
+     * For example:
+
+        $client = ApiClient::newPublicClient();
+        $client->streamOperations(null, function(Operation $operation) {
+            printf('Effect type: %s' . PHP_EOL, $effect->getType());
+        });
+     *
+     * @param null $sinceCursor
+     * @param callable $callback
+     */
+    public function streamOperations($sinceCursor = 'now', callable $callback = null)
+    {
+        $url = sprintf('/operations');
+        $params = [];
+
+        if ($sinceCursor) $params['cursor'] = $sinceCursor;
+
+        if ($params) {
+            $url .= '?' . http_build_query($params);
+        }
+
+        $this->getAndStream($url, function($rawData) use ($callback) {
+            $parsedObject = Operation::fromRawResponseData($rawData);
+            $parsedObject->setApiClient($this);
+
+            $callback($parsedObject);
+        });
+    }
+
+    /**
+     * Streams Payment objects to $callback
+     *
+     * $callback should have arguments:
+     *  Payment
+     *
+     * For example:
+
+        $client = ApiClient::newPublicClient();
+        $client->streamPayments(null, function(Payment $payment) {
+            todo
+        });
+     *
+     * @param null $sinceCursor
+     * @param callable $callback
+     */
+    public function streamPayments($sinceCursor = 'now', callable $callback = null)
+    {
+        $url = sprintf('/payments');
+        $params = [];
+
+        if ($sinceCursor) $params['cursor'] = $sinceCursor;
+
+        if ($params) {
+            $url .= '?' . http_build_query($params);
+        }
+
+        $this->getAndStream($url, function($rawData) use ($callback) {
+            $parsedObject = Payment::fromRawResponseData($rawData);
+            $parsedObject->setApiClient($this);
+
+            $callback($parsedObject);
+        });
+    }
+
+    /**
+     * @param $relativeUrl
+     * @param $callback
+     */
     public function getAndStream($relativeUrl, $callback)
     {
-        try {
-            $response = $this->httpClient->get($relativeUrl, [
-                'stream' => true,
-                'read_timeout' => null,
-                'headers' => [
-                    'Accept' => 'text/event-stream',
-                ]
-            ]);
+        while (true) {
+            try {
+                $response = $this->httpClient->get($relativeUrl, [
+                    'stream' => true,
+                    'read_timeout' => null,
+                    'headers' => [
+                        'Accept' => 'text/event-stream',
+                    ]
+                ]);
 
-            $body = $response->getBody();
+                $body = $response->getBody();
 
-            while (!$body->eof()) {
-                $line = '';
+                while (!$body->eof()) {
+                    $line = '';
 
-                $char = null;
-                while ($char != "\n") {
-                    $line .= $char;
-                    $char = $body->read(1);
+                    $char = null;
+                    while ($char != "\n") {
+                        $line .= $char;
+                        $char = $body->read(1);
+                    }
+
+                    // Ignore empty lines
+                    if (!$line) continue;
+
+                    // Ignore "data: hello" handshake
+                    if (strpos($line, 'data: "hello"') === 0) continue;
+
+                    // Ignore lines that don't start with "data: "
+                    $sentinel = 'data: ';
+                    if (strpos($line, $sentinel) !== 0) continue;
+
+                    // Remove sentinel prefix
+                    $json = substr($line, strlen($sentinel));
+
+                    $decoded = json_decode($json, true);
+                    if ($decoded) {
+                        $callback($decoded);
+                    }
                 }
 
-                // Ignore empty lines
-                if (!$line) continue;
-
-                // Ignore "data: hello" handshake
-                if (strpos($line, 'data: "hello"') === 0) continue;
-
-                // Ignore lines that don't start with "data: "
-                $sentinel = 'data: ';
-                if (strpos($line, $sentinel) !== 0) continue;
-
-                // Remove sentinel prefix
-                $json = substr($line, strlen($sentinel));
-
-                $decoded = json_decode($json, true);
-                if ($decoded) {
-                    $callback($decoded);
-                }
             }
-
-        }
-        catch (ClientException $e) {
-            print "Client error:\n";
-            print $e->getResponse()->getBody() . "\n";
+            catch (ClientException $e) {
+                print "Client error:\n";
+                print $e->getResponse()->getBody() . "\n";
+                return;
+            }
+            catch (ServerException $e) {
+                print "Server error, retrying after a brief delay...\n";
+                sleep(10);
+            }
         }
     }
 }

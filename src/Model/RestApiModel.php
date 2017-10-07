@@ -7,9 +7,52 @@ use ZuluCrypto\StellarSdk\Horizon\ApiClient;
 class RestApiModel
 {
     /**
+     * ID within the Stellar network
+     *
+     * @var string
+     */
+    protected $id;
+
+    /**
+     * Array of links to other objects that can be retrieved via the REST API
+     *
+     * @var array
+     */
+    protected $links;
+
+    /**
+     * Paging token for iterating within a stream
+     *
+     * @var string
+     */
+    protected $pagingToken;
+
+    /**
      * @var ApiClient
      */
     protected $apiClient;
+
+    public function loadFromRawResponseData($rawData)
+    {
+        if (isset($rawData['_links'])) $this->links = $rawData['_links'];
+        if (isset($rawData['id'])) $this->id = $rawData['id'];
+    }
+
+    /**
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param string $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
 
     /**
      * @return ApiClient
@@ -25,5 +68,37 @@ class RestApiModel
     public function setApiClient($apiClient)
     {
         $this->apiClient = $apiClient;
+    }
+
+    /**
+     * @return array
+     */
+    public function getLinks()
+    {
+        return $this->links;
+    }
+
+    /**
+     * @param array $links
+     */
+    public function setLinks($links)
+    {
+        $this->links = $links;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPagingToken()
+    {
+        return $this->pagingToken;
+    }
+
+    /**
+     * @param string $pagingToken
+     */
+    public function setPagingToken($pagingToken)
+    {
+        $this->pagingToken = $pagingToken;
     }
 }

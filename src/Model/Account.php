@@ -196,7 +196,7 @@ class Account extends RestApiModel
      * @param null $sinceCursor
      * @param callable $callback
      */
-    public function streamPayments($sinceCursor = null, callable $callback = null)
+    public function streamPayments($sinceCursor = 'now', callable $callback = null)
     {
         $url = sprintf('/accounts/%s/payments', $this->accountId);
         $params = [];
