@@ -31,9 +31,20 @@ class Server
         return $server;
     }
 
+    /**
+     * @return Server
+     */
+    public static function publicNet()
+    {
+        $server = new Server(ApiClient::newPublicClient());
+
+        return $server;
+    }
+
     public function __construct(ApiClient $apiClient)
     {
         $this->apiClient = $apiClient;
+        $this->isTestnet = false;
     }
 
     /**
