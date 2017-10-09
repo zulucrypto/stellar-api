@@ -13,6 +13,7 @@ use ZuluCrypto\StellarSdk\Model\Effect;
 use ZuluCrypto\StellarSdk\Model\Ledger;
 use ZuluCrypto\StellarSdk\Model\Operation;
 use ZuluCrypto\StellarSdk\Model\Payment;
+use ZuluCrypto\StellarSdk\Model\Transaction;
 use ZuluCrypto\StellarSdk\Transaction\TransactionBuilder;
 use ZuluCrypto\StellarSdk\Util\Hash;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
@@ -279,7 +280,7 @@ class ApiClient
 
         $client = ApiClient::newPublicClient();
         $client->streamPayments(null, function(Payment $payment) {
-            todo
+            printf('Payment: from %s to %s' . PHP_EOL, $payment->getFromAccountId(), $payment->getToAccountId());
         });
      *
      * @param null $sinceCursor
@@ -298,6 +299,41 @@ class ApiClient
 
         $this->getAndStream($url, function($rawData) use ($callback) {
             $parsedObject = Payment::fromRawResponseData($rawData);
+            $parsedObject->setApiClient($this);
+
+            $callback($parsedObject);
+        });
+    }
+
+    /**
+     * Streams Transaction objects to $callback
+     *
+     * $callback should have arguments:
+     *  Transaction
+     *
+     * For example:
+
+        $client = ApiClient::newPublicClient();
+        $client->streamTransactions(null, function(Transaction $transaction) {
+            printf('Transaction id %s' . PHP_EOL, $transaction->getId());
+        });
+     *
+     * @param null $sinceCursor
+     * @param callable $callback
+     */
+    public function streamTransactions($sinceCursor = 'now', callable $callback = null)
+    {
+        $url = sprintf('/transactions');
+        $params = [];
+
+        if ($sinceCursor) $params['cursor'] = $sinceCursor;
+
+        if ($params) {
+            $url .= '?' . http_build_query($params);
+        }
+
+        $this->getAndStream($url, function($rawData) use ($callback) {
+            $parsedObject = Transaction::fromRawResponseData($rawData);
             $parsedObject->setApiClient($this);
 
             $callback($parsedObject);
