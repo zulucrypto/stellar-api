@@ -32,8 +32,17 @@ class RestApiModel
      */
     protected $apiClient;
 
+    /**
+     * The raw response json
+     *
+     * @var array
+     */
+    protected $rawData;
+
     public function loadFromRawResponseData($rawData)
     {
+        $this->rawData = $rawData;
+
         if (isset($rawData['_links'])) $this->links = $rawData['_links'];
         if (isset($rawData['id'])) $this->id = $rawData['id'];
     }
@@ -100,5 +109,21 @@ class RestApiModel
     public function setPagingToken($pagingToken)
     {
         $this->pagingToken = $pagingToken;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRawData()
+    {
+        return $this->rawData;
+    }
+
+    /**
+     * @param array $rawData
+     */
+    public function setRawData($rawData)
+    {
+        $this->rawData = $rawData;
     }
 }
