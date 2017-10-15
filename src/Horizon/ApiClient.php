@@ -343,8 +343,9 @@ class ApiClient
     /**
      * @param $relativeUrl
      * @param $callback
+     * @param $retryOnServerException bool If true, ignore ServerException errors and retry
      */
-    public function getAndStream($relativeUrl, $callback)
+    public function getAndStream($relativeUrl, $callback, $retryOnServerException = true)
     {
         while (true) {
             try {
@@ -387,13 +388,10 @@ class ApiClient
                 }
 
             }
-            catch (ClientException $e) {
-                print "Client error:\n";
-                print $e->getResponse()->getBody() . "\n";
-                return;
-            }
             catch (ServerException $e) {
-                print "Server error, retrying after a brief delay...\n";
+                if (!$retryOnServerException) throw $e;
+
+                // Delay for a bit before trying again
                 sleep(10);
             }
         }
