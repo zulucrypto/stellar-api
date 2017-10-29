@@ -5,7 +5,6 @@ namespace ZuluCrypto\StellarSdk\XdrModel\Operation;
 
 
 use phpseclib\Math\BigInteger;
-use ZuluCrypto\StellarSdk\Util\Debug;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 use ZuluCrypto\StellarSdk\XdrModel\AccountId;
 use ZuluCrypto\StellarSdk\XdrModel\Asset;
@@ -27,9 +26,9 @@ class PaymentOp extends Operation
      */
     private $amount;
 
-    public static function newNativePayment($destinationAccountId, $amount)
+    public static function newNativePayment($sourceAccountId, $destinationAccountId, $amount)
     {
-        $op = new PaymentOp();
+        $op = new PaymentOp(new AccountId($sourceAccountId));
         $op->destination = new AccountId($destinationAccountId);
         $op->asset = Asset::newNativeAsset();
         $op->setAmount($amount);
@@ -37,9 +36,9 @@ class PaymentOp extends Operation
         return $op;
     }
 
-    public static function newCustomPayment($destinationAccountId, $amount, $assetCode, $assetIssuerId)
+    public static function newCustomPayment($sourceAccountId, $destinationAccountId, $amount, $assetCode, $assetIssuerId)
     {
-        $op = new PaymentOp();
+        $op = new PaymentOp(new AccountId($sourceAccountId));
         $op->destination = new AccountId($destinationAccountId);
         $op->setAmount($amount);
         $op->asset = Asset::newCustomAsset($assetCode, $assetIssuerId);
@@ -47,9 +46,9 @@ class PaymentOp extends Operation
         return $op;
     }
 
-    public function __construct()
+    public function __construct(AccountId $sourceAccount)
     {
-        parent::__construct(Operation::TYPE_PAYMENT);
+        parent::__construct(Operation::TYPE_PAYMENT, $sourceAccount);
     }
 
     public function toXdr()

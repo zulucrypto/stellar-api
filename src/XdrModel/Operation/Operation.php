@@ -25,6 +25,8 @@ use ZuluCrypto\StellarSdk\XdrModel\AccountId;
         manageDatum: 10,
     });
  *
+ * See: https://github.com/stellar/stellar-core/blob/master/src/xdr/Stellar-transaction.x
+ *
  */
 abstract class Operation implements XdrEncodableInterface
 {
@@ -52,8 +54,9 @@ abstract class Operation implements XdrEncodableInterface
      * @param $type int operation type constant
      * @return Operation
      */
-    public function __construct($type)
+    public function __construct($type, AccountId $sourceAccount)
     {
+        $this->sourceAccount = $sourceAccount;
         $this->type = $type;
 
         return $this;
