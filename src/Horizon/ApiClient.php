@@ -41,11 +41,16 @@ class ApiClient
     private $isTestnet;
 
     /**
+     * @var string
+     */
+    private $networkPassphrase;
+
+    /**
      * @return ApiClient
      */
     public static function newTestnetClient()
     {
-        $apiClient = new ApiClient('https://horizon-testnet.stellar.org/');
+        $apiClient = new ApiClient('https://horizon-testnet.stellar.org/', self::NETWORK_PASSPHRASE_TEST);
         $apiClient->isTestnet = true;
 
         return $apiClient;
@@ -56,7 +61,18 @@ class ApiClient
      */
     public static function newPublicClient()
     {
-        $apiClient = new ApiClient('https://horizon.stellar.org/');
+        return new ApiClient('https://horizon.stellar.org/', self::NETWORK_PASSPHRASE_PUBLIC);
+    }
+
+    /**
+     * @param $horizonBaseUrl
+     * @param $networkPassphrase
+     * @return ApiClient
+     */
+    public static function newCustomClient($horizonBaseUrl, $networkPassphrase)
+    {
+        $apiClient = new ApiClient($horizonBaseUrl, $networkPassphrase);
+        $apiClient->isTestnet = true;
 
         return $apiClient;
     }
@@ -65,13 +81,15 @@ class ApiClient
      * ApiClient constructor.
      *
      * @param $baseUrl string root URL of the horizon server, such as https://horizon-testnet.stellar.org/
+     * @param $networkPassphrase string Passphrase used when signing transactions on the network
      */
-    public function __construct($baseUrl)
+    public function __construct($baseUrl, $networkPassphrase)
     {
         $this->baseUrl = $baseUrl;
         $this->httpClient = new Client([
             'base_uri' => $baseUrl,
         ]);
+        $this->networkPassphrase = $networkPassphrase;
     }
 
     /**
@@ -80,10 +98,9 @@ class ApiClient
      */
     public function hash(TransactionBuilder $transactionBuilder)
     {
-        $passphrase = ($this->isTestnet) ? self::NETWORK_PASSPHRASE_TEST : self::NETWORK_PASSPHRASE_PUBLIC;
         $hashedValue = '';
 
-        $hashedValue .= Hash::generate($passphrase);
+        $hashedValue .= Hash::generate($this->networkPassphrase);
         $hashedValue .= XdrEncoder::unsignedInteger(TransactionEnvelope::TYPE_TX);
         $hashedValue .= $transactionBuilder->toXdr();
 

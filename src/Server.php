@@ -3,6 +3,7 @@
 namespace ZuluCrypto\StellarSdk;
 
 
+use Prophecy\Exception\InvalidArgumentException;
 use ZuluCrypto\StellarSdk\Horizon\ApiClient;
 use ZuluCrypto\StellarSdk\Model\Account;
 use ZuluCrypto\StellarSdk\Model\Payment;
@@ -41,6 +42,18 @@ class Server
         return $server;
     }
 
+    /**
+     * Connects to a custom network
+     *
+     * @param $horizonBaseUrl
+     * @param $networkPassphrase
+     * @return Server
+     */
+    public static function customNet($horizonBaseUrl, $networkPassphrase)
+    {
+        return new Server(ApiClient::newCustomClient($horizonBaseUrl, $networkPassphrase));
+    }
+
     public function __construct(ApiClient $apiClient)
     {
         $this->apiClient = $apiClient;
@@ -53,6 +66,9 @@ class Server
      */
     public function getAccount($accountId)
     {
+        // Cannot be empty
+        if (!$accountId) throw new InvalidArgumentException('Empty accountId');
+
         $response = $this->apiClient->get(sprintf('/accounts/%s', $accountId));
 
         $account = Account::fromHorizonResponse($response);
