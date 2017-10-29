@@ -8,6 +8,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use ZuluCrypto\StellarSdk\Horizon\Api\HorizonResponse;
+use ZuluCrypto\StellarSdk\Horizon\Exception\HorizonException;
 use ZuluCrypto\StellarSdk\Model\Account;
 use ZuluCrypto\StellarSdk\Model\Effect;
 use ZuluCrypto\StellarSdk\Model\Ledger;
@@ -149,9 +150,14 @@ class ApiClient
             $res = $this->httpClient->get($relativeUrl);
         }
         catch (ClientException $e) {
-            // todo: Make HorizonException class and use that instead
-            print "Client error:\n";
-            print $e->getResponse()->getBody() . "\n";
+            // If the response can be json-decoded then it can be converted to a HorizonException
+            $decoded = null;
+            if ($e->getResponse()) {
+                $decoded = json_decode($e->getResponse()->getBody(), true);
+                $horizonException = HorizonException::fromRawResponse($relativeUrl, 'GET', $decoded, $e);
+
+                throw $horizonException;
+            }
         }
 
         return new HorizonResponse($res->getBody());
