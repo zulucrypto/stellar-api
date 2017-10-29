@@ -30,6 +30,33 @@ class HorizonResponse
         return $this->rawData;
     }
 
+    /**
+     * Returns the value of $fieldName or null if $fieldName is not in the response
+     *
+     * @param $fieldName
+     * @return mixed|null
+     */
+    public function getField($fieldName)
+    {
+        if (!isset($this->rawData[$fieldName])) return null;
+
+        return $this->rawData[$fieldName];
+    }
+
+    /**
+     * Throws an exception if $fieldName is not present in the response
+     *
+     * @param $fieldName
+     * @throws \InvalidArgumentException
+     * @return mixed|null
+     */
+    public function mustGetField($fieldName)
+    {
+        if (!isset($this->rawData[$fieldName])) throw new \InvalidArgumentException(sprintf("Field '%s' not present in response", $fieldName));
+
+        return $this->rawData[$fieldName];
+    }
+
     public function getRecords($limit = 100)
     {
         // todo: support paging
