@@ -17,7 +17,7 @@ use ZuluCrypto\StellarSdk\XdrModel\Operation\PaymentOp;
  */
 class Account extends RestApiModel
 {
-    private $id;
+    protected $id;
 
     private $accountId;
 
@@ -75,12 +75,29 @@ class Account extends RestApiModel
         $this->balances = [];
     }
 
-    public function sendPayment(Payment $payment, $signingKey)
+    /**
+     * @param $toAccountId
+     * @param $amount
+     * @param string|string[] $signingKeys
+     * @return HorizonResponse
+     */
+    public function sendNativeAsset($toAccountId, $amount, $signingKeys)
     {
-        $paymentOp = new PaymentOp();
+        $payment = Payment::newNativeAssetPayment($toAccountId, $amount, $this->accountId);
 
+        return $this->sendPayment($payment, $signingKeys);
+    }
+
+    /**
+     * @param Payment $payment
+     * @param         $signingKeys
+     * @return HorizonResponse
+     * @throws \ErrorException
+     */
+    public function sendPayment(Payment $payment, $signingKeys)
+    {
         if ($payment->isNativeAsset()) {
-            $paymentOp = PaymentOp::newNativePayment($payment->getDestinationAccountId(), $payment->getAmount()->getUnscaledBalance());
+            $paymentOp = PaymentOp::newNativePayment($this->accountId, $payment->getDestinationAccountId(), $payment->getAmount()->getUnscaledBalance());
         }
         else {
             throw new \ErrorException('Not implemented');
@@ -93,7 +110,7 @@ class Account extends RestApiModel
             )
         ;
 
-        return $transaction->submit($signingKey);
+        return $transaction->submit($signingKeys);
     }
 
     /**

@@ -36,7 +36,9 @@ class Payment extends Operation
      */
     public static function fromRawResponseData($rawData)
     {
-        $object = new Payment($rawData['id'], $rawData['type']);
+        if (!$rawData['type'] != Operation::TYPE_PAYMENT) throw new \InvalidArgumentException(sprintf('Attempted to create a Payment from invalid type %s', $rawData['type']));
+
+        $object = new Payment($rawData['id']);
 
         $object->loadFromRawResponseData($rawData);
 
@@ -44,10 +46,27 @@ class Payment extends Operation
     }
 
     /**
+     * @param $toAccountId
+     * @param $amount
+     * @return Payment
+     */
+    public static function newNativeAssetPayment($toAccountId, $amount, $fromAccountId, $sourceAccountId = null)
+    {
+        $payment = new Payment(null);
+        $payment->toAccountId = $toAccountId;
+        $payment->amount = new AssetAmount($amount);
+        $payment->fromAccountId = $fromAccountId;
+
+        if ($sourceAccountId === null) $payment->sourceAccountId = $fromAccountId;
+
+        return $payment;
+    }
+
+    /**
      * @param $id
      * @param $type
      */
-    public function __construct($id, $type)
+    public function __construct($id)
     {
         parent::__construct($id, Operation::TYPE_PAYMENT);
 
