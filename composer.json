@@ -18,5 +18,8 @@
             "name": "Zulu Crypto",
             "email": "zulucrypto@protonmail.com"
         }
-    ]
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "^6.4"
+    }
 }
