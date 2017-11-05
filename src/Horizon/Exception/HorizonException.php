@@ -60,6 +60,13 @@ class HorizonException extends \Exception
     protected $clientException;
 
     /**
+     * Raw response data, if known
+     *
+     * @var array
+     */
+    protected $raw;
+
+    /**
      * @param                 $requestedUrl
      * @param                 $httpMethod
      * @param                 $raw
@@ -82,6 +89,9 @@ class HorizonException extends \Exception
         // Message can contain better info after we've filled out more fields
         $exception->message = $exception->__toString();
 
+        $exception->raw = $raw;
+        $exception->clientException = $clientException;
+
         return $exception;
     }
 
@@ -98,13 +108,23 @@ class HorizonException extends \Exception
      * @return string
      */
     public function __toString() {
-        return sprintf('[%s] %s: %s (Requested URL: %s %s)',
+        // Additional data used to help the user resolve the error
+        $hint = '';
+
+        $message = sprintf('[%s] %s: %s (Requested URL: %s %s)',
             $this->httpStatusCode,
             $this->title,
             $this->detail,
             $this->httpMethod,
             $this->requestedUrl
         );
+
+        // Rate limit exceeded
+        if ('429' == $this->httpStatusCode) {
+            // todo: check response headers and provide better error message
+        }
+
+        return $message;
     }
 
     /**
