@@ -94,18 +94,34 @@ class ApiClient
     }
 
     /**
+     * todo: rename to getHashAsBytes
+     *
      * @param TransactionBuilder $transactionBuilder
      * @return string
      */
     public function hash(TransactionBuilder $transactionBuilder)
     {
-        $hashedValue = '';
+        return Hash::generate($this->getTransactionEnvelope($transactionBuilder));
+    }
 
-        $hashedValue .= Hash::generate($this->networkPassphrase);
-        $hashedValue .= XdrEncoder::unsignedInteger(TransactionEnvelope::TYPE_TX);
-        $hashedValue .= $transactionBuilder->toXdr();
+    public function getTransactionEnvelope(TransactionBuilder $transactionBuilder)
+    {
+        $transactionBytes = '';
 
-        return Hash::generate($hashedValue);
+        $transactionBytes .= Hash::generate($this->networkPassphrase);
+        $transactionBytes .= XdrEncoder::unsignedInteger(TransactionEnvelope::TYPE_TX);
+        $transactionBytes .= $transactionBuilder->toXdr();
+
+        return $transactionBytes;
+    }
+
+    /**
+     * @param TransactionBuilder $transactionBuilder
+     * @return string
+     */
+    public function getHashAsString(TransactionBuilder $transactionBuilder)
+    {
+        return Hash::asString($this->getTransactionEnvelope($transactionBuilder));
     }
 
     /**
@@ -418,5 +434,21 @@ class ApiClient
                 sleep(10);
             }
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getNetworkPassphrase()
+    {
+        return $this->networkPassphrase;
+    }
+
+    /**
+     * @param string $networkPassphrase
+     */
+    public function setNetworkPassphrase($networkPassphrase)
+    {
+        $this->networkPassphrase = $networkPassphrase;
     }
 }
