@@ -95,6 +95,14 @@ class TransactionBuilder implements XdrEncodableInterface
     }
 
     /**
+     * @return TransactionEnvelope
+     */
+    public function getTransactionEnvelope()
+    {
+        return new TransactionEnvelope($this);
+    }
+
+    /**
      * @param $secretKeyString
      * @return TransactionEnvelope
      */
@@ -106,6 +114,11 @@ class TransactionBuilder implements XdrEncodableInterface
     public function hash()
     {
         return $this->apiClient->hash($this);
+    }
+
+    public function getHashAsString()
+    {
+        return $this->apiClient->getHashAsString($this);
     }
 
     /**
