@@ -19,7 +19,7 @@ $destinationAccount = $server->getAccount($destinationAccountId);
 $transaction = \ZuluCrypto\StellarSdk\Server::testNet()
     ->buildTransaction($sourceKeypair->getPublicKey())
     ->addOperation(
-        PaymentOp::newNativePayment($destinationAccountId, "10")
+        PaymentOp::newNativePayment($sourceKeypair->getPublicKey(), $destinationAccountId, "10")
     )
 ;
 
