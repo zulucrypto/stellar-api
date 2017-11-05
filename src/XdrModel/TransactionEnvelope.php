@@ -7,8 +7,10 @@ namespace ZuluCrypto\StellarSdk\XdrModel;
 use ZuluCrypto\StellarSdk\Keypair;
 use ZuluCrypto\StellarSdk\Transaction\TransactionBuilder;
 use ZuluCrypto\StellarSdk\Util\Debug;
+use ZuluCrypto\StellarSdk\Util\Hash;
 use ZuluCrypto\StellarSdk\Xdr\Iface\XdrEncodableInterface;
 use ZuluCrypto\StellarSdk\Xdr\Type\VariableArray;
+use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 
 class TransactionEnvelope implements XdrEncodableInterface
 {
@@ -19,7 +21,7 @@ class TransactionEnvelope implements XdrEncodableInterface
     /**
      * @var TransactionBuilder[]
      */
-    private $transaction;
+    private $transactionBuilder;
 
     /**
      * @var VariableArray of DecoratedSignature
@@ -28,7 +30,7 @@ class TransactionEnvelope implements XdrEncodableInterface
 
     public function __construct(TransactionBuilder $transactionBuilder)
     {
-        $this->transaction = $transactionBuilder;
+        $this->transactionBuilder = $transactionBuilder;
         $this->signatures = new VariableArray();
 
         return $this;
@@ -38,7 +40,7 @@ class TransactionEnvelope implements XdrEncodableInterface
     {
         $bytes = '';
 
-        $bytes .= $this->transaction->toXdr();
+        $bytes .= $this->transactionBuilder->toXdr();
         $bytes .= $this->signatures->toXdr();
 
         return $bytes;
@@ -49,7 +51,7 @@ class TransactionEnvelope implements XdrEncodableInterface
         if (!is_array($secretKeyStrings)) $secretKeyStrings = [$secretKeyStrings];
 
         foreach ($secretKeyStrings as $secretKeyString) {
-            $transactionHash = $this->transaction->hash();
+            $transactionHash = $this->transactionBuilder->hash();
 
             $keypair = Keypair::newFromSeed($secretKeyString);
 
@@ -58,5 +60,12 @@ class TransactionEnvelope implements XdrEncodableInterface
         }
 
         return $this;
+    }
+
+    public function addSignature($signatureBytes, $hint = null)
+    {
+        $decorated = new DecoratedSignature($hint, $signatureBytes);
+
+        $this->signatures->append($decorated);
     }
 }
