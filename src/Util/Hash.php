@@ -16,4 +16,15 @@ class Hash
     {
         return hash('sha256', $data, true);
     }
+
+    /**
+     * Returns a string representation of the sha-256 hash of $data
+     *
+     * @param $data
+     * @return string
+     */
+    public static function asString($data)
+    {
+        return hash('sha256', $data, false);
+    }
 }
