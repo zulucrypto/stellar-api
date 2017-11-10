@@ -18,3 +18,7 @@ See the [getting-started](getting-started/) directory for examples of how to use
 These examples are modeled after the ones in Stellar's getting started guide:
 
 https://www.stellar.org/developers/guides/get-started/create-account.html
+
+## Donations
+
+GCUVDZRQ6CX347AMUUWZDYSNDFAWDN6FUYM5DVYYVO574NHTAUCQAK53
