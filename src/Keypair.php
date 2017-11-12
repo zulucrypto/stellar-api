@@ -5,9 +5,13 @@ namespace ZuluCrypto\StellarSdk;
 
 
 use ParagonIE\Sodium\Core\Ed25519;
-use ZuluCrypto\StellarSdk\Util\Debug;
+use ZuluCrypto\StellarSdk\Derivation\Bip39\Bip39;
+use ZuluCrypto\StellarSdk\Derivation\HdNode;
 use ZuluCrypto\StellarSdk\XdrModel\DecoratedSignature;
 
+/**
+ * A public/private keypair for use with the Stellar network
+ */
 class Keypair
 {
 
@@ -39,21 +43,60 @@ class Keypair
      */
     private $publicKey;
 
+    /**
+     * Creates a new random keypair
+     *
+     * @return Keypair
+     */
     public static function newFromRandom()
     {
         return self::newFromRawSeed(random_bytes(32));
     }
 
+    /**
+     * Creates a new keypair from a base-32 encoded string (S...)
+     *
+     * @param $base32String
+     * @return Keypair
+     */
     public static function newFromSeed($base32String)
     {
         return new Keypair($base32String);
     }
 
+    /**
+     * Creates a new keypair from 32 bytes of entropy
+     *
+     * @param $rawSeed (32-byte string)
+     * @return Keypair
+     */
     public static function newFromRawSeed($rawSeed)
     {
         $seedString = AddressableKey::seedFromRawBytes($rawSeed);
 
         return new Keypair($seedString);
+    }
+
+    /**
+     * Creates a new keypair from a mnemonic, passphrase (optional) and index (defaults to 0)
+     *
+     * For more details, see https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0005.md
+     *
+     * @param        $mnemonic
+     * @param string $passphrase
+     * @param int    $index
+     * @return Keypair
+     */
+    public static function newFromMnemonic($mnemonic, $passphrase = '', $index = 0)
+    {
+        $bip39 = new Bip39();
+        $seedBytes = $bip39->mnemonicToSeedBytesWithErrorChecking($mnemonic, $passphrase);
+
+        $masterNode = HdNode::newMasterNode($seedBytes);
+
+        $accountNode = $masterNode->derivePath(sprintf("m/44'/148'/%s'", $index));
+
+        return static::newFromRawSeed($accountNode->getPrivateKeyBytes());
     }
 
     public function __construct($seedString)

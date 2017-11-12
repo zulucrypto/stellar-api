@@ -31,6 +31,8 @@ class AddressableKey
 
     public static function seedFromRawBytes($rawBytes)
     {
+        if (strlen($rawBytes) != 32) throw new \InvalidArgumentException('$rawBytes must be 32 bytes');
+
         // Must be interpreted as a byte
         $version = pack('C', self::VERSION_BYTE_SEED);
 
