@@ -11,7 +11,7 @@ use ZuluCrypto\StellarSdk\Test\Util\IntegrationTest;
 class ServerTest extends IntegrationTest
 {
     /**
-     * @group integration
+     * @group requires-integrationnet
      */
     public function testConnectToCustomNetwork()
     {

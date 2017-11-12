@@ -5,7 +5,7 @@ namespace ZuluCrypto\StellarSdk\Test\Util;
 use PHPUnit\Framework\TestCase;
 use ZuluCrypto\StellarSdk\Server;
 
-class IntegrationTest extends TestCase
+abstract class IntegrationTest extends TestCase
 {
     /**
      * Base URL for the Horizon API server
