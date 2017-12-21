@@ -55,6 +55,9 @@ class AccountId implements XdrEncodableInterface
 
     public function __construct($accountIdString)
     {
+        if (!is_string($accountIdString)) {
+            throw new \InvalidArgumentException('Must pass a string for $accountIdString');
+        }
         $this->accountIdString = $accountIdString;
         $this->accountIdBytes = AddressableKey::getRawBytesFromBase32AccountId($accountIdString);
     }
