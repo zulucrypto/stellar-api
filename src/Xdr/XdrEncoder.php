@@ -101,6 +101,8 @@ class XdrEncoder
 
     public static function unsignedInteger64($value)
     {
+        if ($value > PHP_INT_MAX) throw new \InvalidArgumentException('value is greater than PHP_INT_MAX');
+
         // unsigned 64-bit big-endian
         return pack('J', $value);
     }
