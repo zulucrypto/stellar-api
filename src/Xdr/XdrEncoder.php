@@ -128,6 +128,11 @@ class XdrEncoder
         return ($value) ? self::unsignedInteger(1) : self::unsignedInteger(0);
     }
 
+    /**
+     * @param      $value
+     * @param null $maximumLength
+     * @return string
+     */
     public static function string($value, $maximumLength = null)
     {
         if ($maximumLength === null) $maximumLength = pow(2, 32) - 1;
@@ -136,6 +141,13 @@ class XdrEncoder
 
         $bytes = self::unsignedInteger(strlen($value));
         $bytes .= $value;
+
+        // Pad with null bytes to get a multiple of 4 bytes
+        $remainder = 4 - (strlen($value) % 4);
+        while ($remainder > 0) {
+            $bytes .= "\0";
+            $remainder--;
+        }
 
         return $bytes;
     }
