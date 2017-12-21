@@ -4,6 +4,7 @@
 namespace ZuluCrypto\StellarSdk\Transaction;
 
 use ZuluCrypto\StellarSdk\Horizon\ApiClient;
+use ZuluCrypto\StellarSdk\Keypair;
 use ZuluCrypto\StellarSdk\Util\MathSafety;
 use ZuluCrypto\StellarSdk\Xdr\Iface\XdrEncodableInterface;
 use ZuluCrypto\StellarSdk\Xdr\Type\VariableArray;
@@ -127,11 +128,15 @@ class TransactionBuilder implements XdrEncodableInterface
     }
 
     /**
-     * @param $secretKeyString
+     * @param $secretKeyString string|Keypair
      * @return \ZuluCrypto\StellarSdk\Horizon\Api\HorizonResponse
      */
     public function submit($secretKeyString)
     {
+        if ($secretKeyString instanceof Keypair) {
+            $secretKeyString = $secretKeyString->getSecret();
+        }
+
         return $this->apiClient->submitTransaction($this, $secretKeyString);
     }
 
@@ -153,9 +158,9 @@ class TransactionBuilder implements XdrEncodableInterface
     }
 
     /**
-     * @param Asset $asset
-     * @param       $amount
-     * @param       $destinationAccountId
+     * @param Asset          $asset
+     * @param                $amount
+     * @param string|Keypair $destinationAccountId
      * @return TransactionBuilder
      */
     public function addCustomAssetPaymentOp(Asset $asset, $amount, $destinationAccountId)
@@ -167,12 +172,16 @@ class TransactionBuilder implements XdrEncodableInterface
 
     /**
      * @param Asset $asset
-     * @param       $amount
+     * @param int   $amount defaults to PHP_INT_MAX if null
      * @param null  $sourceAccountId
      * @return TransactionBuilder
      */
-    public function addChangeTrustOp(Asset $asset, $amount, $sourceAccountId = null)
+    public function addChangeTrustOp(Asset $asset, $amount = null, $sourceAccountId = null)
     {
+        if ($amount === null) {
+            $amount = PHP_INT_MAX;
+        }
+
         return $this->addOperation(new ChangeTrustOp($asset, $amount, $sourceAccountId));
     }
 
