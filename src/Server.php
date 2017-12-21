@@ -132,10 +132,28 @@ class Server
 
     /**
      * @param $accountId
+     * @return bool
      * @throws Horizon\Exception\HorizonException
      */
     public function fundAccount($accountId)
     {
-        $this->apiClient->get(sprintf('/friendbot?addr=%s', $accountId));
+        if ($accountId instanceof Keypair) {
+            $accountId = $accountId->getPublicKey();
+        }
+
+        try {
+            $this->apiClient->get(sprintf('/friendbot?addr=%s', $accountId));
+            return true;
+        }
+        catch (HorizonException $e) {
+            // Account has already been funded
+            if ($e->getHttpStatusCode() == 400) {
+                return false;
+            }
+
+            // Unexpected exception
+            throw $e;
+        }
+
     }
 }
