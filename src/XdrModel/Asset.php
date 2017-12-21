@@ -98,4 +98,52 @@ class Asset implements XdrEncodableInterface
 
         return $bytes;
     }
+
+    /**
+     * @return int
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param int $type
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAssetCode()
+    {
+        return $this->assetCode;
+    }
+
+    /**
+     * @param string $assetCode
+     */
+    public function setAssetCode($assetCode)
+    {
+        $this->assetCode = $assetCode;
+    }
+
+    /**
+     * @return AccountId
+     */
+    public function getIssuer()
+    {
+        return $this->issuer;
+    }
+
+    /**
+     * @param AccountId $issuer
+     */
+    public function setIssuer($issuer)
+    {
+        $this->issuer = $issuer;
+    }
 }
