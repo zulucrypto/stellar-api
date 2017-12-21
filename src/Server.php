@@ -5,6 +5,7 @@ namespace ZuluCrypto\StellarSdk;
 
 use Prophecy\Exception\InvalidArgumentException;
 use ZuluCrypto\StellarSdk\Horizon\ApiClient;
+use ZuluCrypto\StellarSdk\Horizon\Exception\HorizonException;
 use ZuluCrypto\StellarSdk\Model\Account;
 use ZuluCrypto\StellarSdk\Model\Payment;
 use ZuluCrypto\StellarSdk\Transaction\TransactionBuilder;
@@ -61,15 +62,34 @@ class Server
     }
 
     /**
-     * @param $accountId string the public account ID
-     * @return Account
+     * Returns the Account that matches $accountId or null if the account does
+     * not exist
+     *
+     * @param $accountId Keypair|string the public account ID
+     * @return Account|null
+     * @throws Horizon\Exception\HorizonException
      */
     public function getAccount($accountId)
     {
         // Cannot be empty
         if (!$accountId) throw new InvalidArgumentException('Empty accountId');
 
-        $response = $this->apiClient->get(sprintf('/accounts/%s', $accountId));
+        if ($accountId instanceof Keypair) {
+            $accountId = $accountId->getPublicKey();
+        }
+
+        try {
+            $response = $this->apiClient->get(sprintf('/accounts/%s', $accountId));
+        }
+        catch (HorizonException $e) {
+            // Account not found, return null
+            if ($e->getHttpStatusCode() === 404) {
+                return null;
+            }
+
+            // A problem we can't handle, rethrow
+            throw $e;
+        }
 
         $account = Account::fromHorizonResponse($response);
         $account->setApiClient($this->apiClient);
@@ -78,11 +98,15 @@ class Server
     }
 
     /**
-     * @param $accountId
+     * @param $accountId string|Keypair
      * @return TransactionBuilder
      */
     public function buildTransaction($accountId)
     {
+        if ($accountId instanceof Keypair) {
+            $accountId = $accountId->getPublicKey();
+        }
+
         return (new TransactionBuilder($accountId))
             ->setApiClient($this->apiClient)
         ;
@@ -104,5 +128,14 @@ class Server
         }
 
         return $payments;
+    }
+
+    /**
+     * @param $accountId
+     * @throws Horizon\Exception\HorizonException
+     */
+    public function fundAccount($accountId)
+    {
+        $this->apiClient->get(sprintf('/friendbot?addr=%s', $accountId));
     }
 }
