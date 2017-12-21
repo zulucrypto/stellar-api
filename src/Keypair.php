@@ -141,6 +141,14 @@ class Keypair
         return $this->seed;
     }
 
+    /**
+     * @return bool|string
+     */
+    public function getPrivateKeyBytes()
+    {
+        return AddressableKey::getRawBytesFromBase32Seed($this->seed);
+    }
+
     public function getPublicKey()
     {
         return $this->publicKeyString;
