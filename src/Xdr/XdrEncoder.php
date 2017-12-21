@@ -176,6 +176,44 @@ class XdrEncoder
     }
 
     /**
+     * @param $value
+     * @return string
+     */
+    public static function optionalUnsignedInteger($value)
+    {
+        $bytes = '';
+
+        if ($value !== null) {
+            $bytes .= self::boolean(true);
+            $bytes .= static::unsignedInteger($value);
+        }
+        else {
+            $bytes .= self::boolean(false);
+        }
+
+        return $bytes;
+    }
+
+    /**
+     * @param $value
+     * @return string
+     */
+    public static function optionalString($value, $maximumLength)
+    {
+        $bytes = '';
+
+        if ($value !== null) {
+            $bytes .= self::boolean(true);
+            $bytes .= static::string($value, $maximumLength);
+        }
+        else {
+            $bytes .= self::boolean(false);
+        }
+
+        return $bytes;
+    }
+
+    /**
      * Ensures $value's length is a multiple of $targetLength bytes
      *
      * The default value for XDR is 4
