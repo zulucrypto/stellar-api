@@ -28,7 +28,10 @@ class PaymentOp extends Operation
 
     public static function newNativePayment($sourceAccountId, $destinationAccountId, $amount)
     {
-        $op = new PaymentOp(new AccountId($sourceAccountId));
+        $sourceAccount = null;
+        if ($sourceAccountId) $sourceAccount = new AccountId($sourceAccountId);
+
+        $op = new PaymentOp($sourceAccount);
         $op->destination = new AccountId($destinationAccountId);
         $op->asset = Asset::newNativeAsset();
         $op->setAmount($amount);
@@ -38,7 +41,10 @@ class PaymentOp extends Operation
 
     public static function newCustomPayment($sourceAccountId, $destinationAccountId, $amount, $assetCode, $assetIssuerId)
     {
-        $op = new PaymentOp(new AccountId($sourceAccountId));
+        $sourceAccount = null;
+        if ($sourceAccountId) $sourceAccount = new AccountId($sourceAccountId);
+
+        $op = new PaymentOp($sourceAccount);
         $op->destination = new AccountId($destinationAccountId);
         $op->setAmount($amount);
         $op->asset = Asset::newCustomAsset($assetCode, $assetIssuerId);
@@ -46,7 +52,7 @@ class PaymentOp extends Operation
         return $op;
     }
 
-    public function __construct(AccountId $sourceAccount)
+    public function __construct(AccountId $sourceAccount = null)
     {
         parent::__construct(Operation::TYPE_PAYMENT, $sourceAccount);
     }
@@ -68,11 +74,13 @@ class PaymentOp extends Operation
     public function setAmount($scaledAmountOrBigInteger)
     {
         if (!is_string($scaledAmountOrBigInteger) && !$scaledAmountOrBigInteger instanceof BigInteger) {
-            throw new \InvalidArgumentException(sprintf("For type safety you must pass a string to this method"));
+            if ($scaledAmountOrBigInteger > PHP_INT_MAX) {
+                throw new \InvalidArgumentException(sprintf("you must pass a string to this method since amount is greater than PHP_INT_MAX"));
+            }
         }
 
-        // A scaled amount as a string
-        if (is_string($scaledAmountOrBigInteger)) {
+        // A string or integer
+        if (!$scaledAmountOrBigInteger instanceof BigInteger) {
             $scaledAmountOrBigInteger = new BigInteger($scaledAmountOrBigInteger);
             $rawScale = new BigInteger("10000000");
             $this->amount = $scaledAmountOrBigInteger->multiply($rawScale);
