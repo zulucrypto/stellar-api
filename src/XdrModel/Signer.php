@@ -11,8 +11,6 @@ use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
  * Struct with fields:
  *  key SignerKey
  *  weight uint32
- *
- * todo: implement the rest of the types
  */
 class Signer implements XdrEncodableInterface
 {

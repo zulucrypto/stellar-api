@@ -3,17 +3,12 @@
 namespace ZuluCrypto\StellarSdk\XdrModel;
 
 
+use ZuluCrypto\StellarSdk\Keypair;
 use ZuluCrypto\StellarSdk\Xdr\Iface\XdrEncodableInterface;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 
 /**
- *
- * Union with arms:
- *  ed25519: uint256
- *  preAuthTx: uint256
- *  hashX: uint256
- *
- * todo: implement the rest of the types
+ * Used for adding signers to accounts
  */
 class SignerKey implements XdrEncodableInterface
 {
@@ -34,6 +29,48 @@ class SignerKey implements XdrEncodableInterface
      * @var string
      */
     private $key;
+
+    /**
+     * @param Keypair $keypair
+     * @return SignerKey
+     */
+    public static function fromKeypair(Keypair $keypair)
+    {
+        $signerKey = new SignerKey(static::TYPE_ED25519);
+        $signerKey->key = $keypair->getPrivateKeyBytes();
+
+        return $signerKey;
+    }
+
+    /**
+     * @param $hashBytes
+     * @return SignerKey
+     */
+    public static function fromPreauthorizedHash($hashBytes)
+    {
+        if (strlen($hashBytes) != 32) {
+            throw new \InvalidArgumentException('$hashBytes must be 32 bytes representing the sha256 hash of the transaction');
+        }
+
+        $signerKey = new SignerKey(static::TYPE_PRE_AUTH_TX);
+        $signerKey->key = $hashBytes;
+
+        return $signerKey;
+    }
+
+    /**
+     * Adds the value of $x as a signer on the account
+     *
+     * @param $x
+     * @return SignerKey
+     */
+    public static function fromHashX($x)
+    {
+        $signerKey = new SignerKey(static::TYPE_HASH_X);
+        $signerKey->key = hash('sha256', $x, true);
+
+        return $signerKey;
+    }
 
     public function __construct($type)
     {
