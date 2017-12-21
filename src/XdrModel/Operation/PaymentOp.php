@@ -5,6 +5,7 @@ namespace ZuluCrypto\StellarSdk\XdrModel\Operation;
 
 
 use phpseclib\Math\BigInteger;
+use ZuluCrypto\StellarSdk\Keypair;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 use ZuluCrypto\StellarSdk\XdrModel\AccountId;
 use ZuluCrypto\StellarSdk\XdrModel\Asset;
@@ -39,10 +40,22 @@ class PaymentOp extends Operation
         return $op;
     }
 
+    /**
+     * @param $sourceAccountId
+     * @param $destinationAccountId string|Keypair
+     * @param $amount
+     * @param $assetCode
+     * @param $assetIssuerId
+     * @return PaymentOp
+     */
     public static function newCustomPayment($sourceAccountId, $destinationAccountId, $amount, $assetCode, $assetIssuerId)
     {
         $sourceAccount = null;
         if ($sourceAccountId) $sourceAccount = new AccountId($sourceAccountId);
+
+        if ($destinationAccountId instanceof Keypair) {
+            $destinationAccountId = $destinationAccountId->getPublicKey();
+        }
 
         $op = new PaymentOp($sourceAccount);
         $op->destination = new AccountId($destinationAccountId);
