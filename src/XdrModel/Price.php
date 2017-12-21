@@ -22,7 +22,7 @@ class Price implements XdrEncodableInterface
      */
     protected $denominator;
 
-    public function __construct($numerator, $denominator)
+    public function __construct($numerator, $denominator = 1)
     {
         $this->numerator = $numerator;
         $this->denominator = $denominator;
