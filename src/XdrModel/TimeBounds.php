@@ -32,14 +32,30 @@ class TimeBounds
         $this->maxTime = $maxTime;
     }
 
+    /**
+     * @param \DateTime $min
+     */
+    public function setMinTime(\DateTime $min)
+    {
+        $this->minTime = $min->format('U');
+    }
+
+    /**
+     * @param \DateTime $max
+     */
+    public function setMaxTime(\DateTime $max)
+    {
+        $this->maxTime = $max->format('U');
+    }
+
     public function toXdr()
     {
         $bytes = '';
 
         // Special case: this is an optional union so if both values are null
-        // consider it empty and return uint32 0
+        // consider it empty
         if ($this->minTime === null && $this->maxTime === null) {
-            return XdrEncoder::unsignedInteger(0);
+            return XdrEncoder::boolean(false);
         }
 
         $bytes .= XdrEncoder::boolean(true);
