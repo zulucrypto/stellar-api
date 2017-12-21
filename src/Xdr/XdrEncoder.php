@@ -143,10 +143,12 @@ class XdrEncoder
         $bytes .= $value;
 
         // Pad with null bytes to get a multiple of 4 bytes
-        $remainder = 4 - (strlen($value) % 4);
-        while ($remainder > 0) {
-            $bytes .= "\0";
-            $remainder--;
+        $remainder = (strlen($value) % 4);
+        if ($remainder) {
+            while ($remainder < 4) {
+                $bytes .= "\0";
+                $remainder++;
+            }
         }
 
         return $bytes;
