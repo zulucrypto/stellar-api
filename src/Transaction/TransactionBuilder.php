@@ -12,6 +12,7 @@ use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 use ZuluCrypto\StellarSdk\XdrModel\AccountId;
 use ZuluCrypto\StellarSdk\XdrModel\Asset;
 use ZuluCrypto\StellarSdk\XdrModel\Memo;
+use ZuluCrypto\StellarSdk\XdrModel\Operation\AllowTrustOp;
 use ZuluCrypto\StellarSdk\XdrModel\Operation\ChangeTrustOp;
 use ZuluCrypto\StellarSdk\XdrModel\Operation\CreateAccountOp;
 use ZuluCrypto\StellarSdk\XdrModel\Operation\Operation;
@@ -183,6 +184,48 @@ class TransactionBuilder implements XdrEncodableInterface
         }
 
         return $this->addOperation(new ChangeTrustOp($asset, $amount, $sourceAccountId));
+    }
+
+    /**
+     * This is called by asset issuers to authorize a trustline established by
+     * a client account
+     *
+     * @param Asset $asset
+     * @param       $trustorId
+     * @param null  $sourceAccountId
+     * @return TransactionBuilder
+     */
+    public function authorizeTrustline(Asset $asset, $trustorId, $sourceAccountId = null)
+    {
+        if ($trustorId instanceof Keypair) {
+            $trustorId = $trustorId->getPublicKey();
+        }
+
+        $op = new AllowTrustOp($asset, new AccountId($trustorId), $sourceAccountId);
+        $op->setIsAuthorized(true);
+
+        return $this->addOperation($op);
+    }
+
+    /**
+     * This is called by asset issuers to revoke a trustline established by
+     * a client account
+     *
+     * @param Asset $asset
+     * @param       $trustorId
+     * @param null  $sourceAccountId
+     * @return TransactionBuilder
+     */
+    public function revokeTrustline(Asset $asset, $trustorId, $sourceAccountId = null)
+    {
+        if ($trustorId instanceof Keypair) {
+            $trustorId = $trustorId->getPublicKey();
+        }
+
+        $op = new AllowTrustOp($asset, new AccountId($trustorId), $sourceAccountId);
+        $op->setIsAuthorized(false);
+
+        return $this->addOperation($op);
     }
 
     /**

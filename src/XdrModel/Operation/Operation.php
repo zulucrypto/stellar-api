@@ -36,6 +36,7 @@ abstract class Operation implements XdrEncodableInterface
     const TYPE_CREATE_PASSIVE_OFFER = 4;
     const TYPE_SET_OPTIONS          = 5;
     const TYPE_CHANGE_TRUST         = 6;
+    const TYPE_ALLOW_TRUST          = 7;
 
     /**
      * @var AccountId

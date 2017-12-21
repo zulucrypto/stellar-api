@@ -100,6 +100,14 @@ class Asset implements XdrEncodableInterface
     }
 
     /**
+     * @return bool
+     */
+    public function isNative()
+    {
+        return $this->type === static::TYPE_NATIVE;
+    }
+
+    /**
      * @return int
      */
     public function getType()
