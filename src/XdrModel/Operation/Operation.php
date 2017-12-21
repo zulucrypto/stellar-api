@@ -30,9 +30,12 @@ use ZuluCrypto\StellarSdk\XdrModel\AccountId;
  */
 abstract class Operation implements XdrEncodableInterface
 {
-    const TYPE_CREATE_ACCOUNT   = 0;
-    const TYPE_PAYMENT          = 1;
-    const TYPE_SET_OPTION       = 5;
+    const TYPE_CREATE_ACCOUNT       = 0;
+    const TYPE_PAYMENT              = 1;
+    const TYPE_MANAGE_OFFER         = 3;
+    const TYPE_CREATE_PASSIVE_OFFER = 4;
+    const TYPE_SET_OPTION           = 5;
+    const TYPE_CHANGE_TRUST         = 6;
 
     /**
      * @var AccountId
@@ -52,9 +55,10 @@ abstract class Operation implements XdrEncodableInterface
      * Operation constructor.
      *
      * @param $type int operation type constant
+     * @param $sourceAccount AccountId if null this will default to the source for the transaction
      * @return Operation
      */
-    public function __construct($type, AccountId $sourceAccount)
+    public function __construct($type, AccountId $sourceAccount = null)
     {
         $this->sourceAccount = $sourceAccount;
         $this->type = $type;
