@@ -156,4 +156,12 @@ class Server
         }
 
     }
+
+    /**
+     * @return string
+     */
+    public function getHorizonBaseUrl()
+    {
+        return $this->apiClient->getBaseUrl();
+    }
 }
