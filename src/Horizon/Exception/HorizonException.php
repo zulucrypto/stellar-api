@@ -7,7 +7,7 @@ namespace ZuluCrypto\StellarSdk\Horizon\Exception;
 use GuzzleHttp\Exception\ClientException;
 use Throwable;
 
-class HorizonException extends \Exception
+class HorizonException extends \ErrorException
 {
     /**
      * Usually a URL referencing additional documentation
@@ -73,11 +73,11 @@ class HorizonException extends \Exception
      * @param ClientException $clientException
      * @return HorizonException
      */
-    public static function fromRawResponse($requestedUrl, $httpMethod, $raw, ClientException $clientException)
+    public static function fromRawResponse($requestedUrl, $httpMethod, $raw, ClientException $clientException = null)
     {
         $title = isset($raw['title']) ? $raw['title'] : 'Unknown Exception';
 
-        $exception = new HorizonException($title);
+        $exception = new HorizonException($title, $clientException);
         $exception->title = $title;
         $exception->requestedUrl = $requestedUrl;
         $exception->httpMethod = $httpMethod;
@@ -87,7 +87,7 @@ class HorizonException extends \Exception
         if (isset($raw['detail'])) $exception->detail = $raw['detail'];
 
         // Message can contain better info after we've filled out more fields
-        $exception->message = $exception->__toString();
+        $exception->message = $exception->buildMessage();
 
         $exception->raw = $raw;
         $exception->clientException = $clientException;
@@ -101,13 +101,13 @@ class HorizonException extends \Exception
      */
     public function __construct($title, Throwable $previous = null)
     {
-        parent::__construct($title, 0, $previous);
+        parent::__construct($title, 0, 1, __FILE__, __LINE__, $previous);
     }
 
     /**
      * @return string
      */
-    public function __toString() {
+    protected function buildMessage() {
         // Additional data used to help the user resolve the error
         $hint = '';
 

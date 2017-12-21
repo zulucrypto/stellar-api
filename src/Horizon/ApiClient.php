@@ -156,9 +156,9 @@ class ApiClient
     }
 
     /**
-     * todo: better error handling
      * @param $relativeUrl
      * @return HorizonResponse
+     * @throws HorizonException
      */
     public function get($relativeUrl)
     {
@@ -169,10 +169,12 @@ class ApiClient
             // If the response can be json-decoded then it can be converted to a HorizonException
             $decoded = null;
             if ($e->getResponse()) {
-                $decoded = json_decode($e->getResponse()->getBody(), true);
-                $horizonException = HorizonException::fromRawResponse($relativeUrl, 'GET', $decoded, $e);
-
-                throw $horizonException;
+                $decoded = Json::mustDecode($e->getResponse()->getBody());
+                throw HorizonException::fromRawResponse($relativeUrl, 'GET', $decoded);
+            }
+            // No response, something else went wrong
+            else {
+                throw $e;
             }
         }
 
