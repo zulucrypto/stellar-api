@@ -33,6 +33,7 @@ abstract class Operation implements XdrEncodableInterface
 {
     const TYPE_CREATE_ACCOUNT       = 0;
     const TYPE_PAYMENT              = 1;
+    const TYPE_PATH_PAYMENT         = 2;
     const TYPE_MANAGE_OFFER         = 3;
     const TYPE_CREATE_PASSIVE_OFFER = 4;
     const TYPE_SET_OPTIONS          = 5;
@@ -60,16 +61,19 @@ abstract class Operation implements XdrEncodableInterface
      * Operation constructor.
      *
      * @param $type int operation type constant
-     * @param $sourceAccount AccountId if null this will default to the source for the transaction
+     * @param $sourceAccountId AccountId if null this will default to the source for the transaction
      * @return Operation
      */
-    public function __construct($type, AccountId $sourceAccount = null)
+    public function __construct($type, $sourceAccountId = null)
     {
-        if ($sourceAccount instanceof Keypair) {
-            $sourceAccount = $sourceAccount->getPublicKey();
+        if ($sourceAccountId instanceof Keypair) {
+            $sourceAccountId = new AccountId($sourceAccountId->getPublicKey());
+        }
+        if (is_string($sourceAccountId)) {
+            $sourceAccountId = new AccountId($sourceAccountId);
         }
 
-        $this->sourceAccount = $sourceAccount;
+        $this->sourceAccount = $sourceAccountId;
         $this->type = $type;
 
         return $this;
