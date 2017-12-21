@@ -16,6 +16,7 @@ use ZuluCrypto\StellarSdk\XdrModel\Operation\AccountMergeOp;
 use ZuluCrypto\StellarSdk\XdrModel\Operation\AllowTrustOp;
 use ZuluCrypto\StellarSdk\XdrModel\Operation\ChangeTrustOp;
 use ZuluCrypto\StellarSdk\XdrModel\Operation\CreateAccountOp;
+use ZuluCrypto\StellarSdk\XdrModel\Operation\ManageDataOp;
 use ZuluCrypto\StellarSdk\XdrModel\Operation\Operation;
 use ZuluCrypto\StellarSdk\XdrModel\Operation\PaymentOp;
 use ZuluCrypto\StellarSdk\XdrModel\TimeBounds;
@@ -242,6 +243,27 @@ class TransactionBuilder implements XdrEncodableInterface
         }
 
         return $this->addOperation(new AccountMergeOp($destinationAccountId, $sourceAccountId));
+    }
+
+    /**
+     * @param      $key
+     * @param      $value
+     * @param null $sourceAccountId
+     * @return TransactionBuilder
+     */
+    public function setAccountData($key, $value, $sourceAccountId = null)
+    {
+        return $this->addOperation(new ManageDataOp($key, $value, $sourceAccountId));
+    }
+
+    /**
+     * @param      $key
+     * @param null $sourceAccountId
+     * @return TransactionBuilder
+     */
+    public function clearAccountData($key, $sourceAccountId = null)
+    {
+        return $this->addOperation(new ManageDataOp($key, null, $sourceAccountId));
     }
 
     /**

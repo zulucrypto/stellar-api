@@ -4,6 +4,7 @@
 namespace ZuluCrypto\StellarSdk\XdrModel\Operation;
 
 
+use ZuluCrypto\StellarSdk\Keypair;
 use ZuluCrypto\StellarSdk\Xdr\Iface\XdrEncodableInterface;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 use ZuluCrypto\StellarSdk\XdrModel\AccountId;
@@ -38,6 +39,8 @@ abstract class Operation implements XdrEncodableInterface
     const TYPE_CHANGE_TRUST         = 6;
     const TYPE_ALLOW_TRUST          = 7;
     const TYPE_ACCOUNT_MERGE        = 8;
+    const TYPE_INFLATION            = 8;
+    const TYPE_MANAGE_DATA          = 10;
 
     /**
      * @var AccountId
@@ -62,6 +65,10 @@ abstract class Operation implements XdrEncodableInterface
      */
     public function __construct($type, AccountId $sourceAccount = null)
     {
+        if ($sourceAccount instanceof Keypair) {
+            $sourceAccount = $sourceAccount->getPublicKey();
+        }
+
         $this->sourceAccount = $sourceAccount;
         $this->type = $type;
 
