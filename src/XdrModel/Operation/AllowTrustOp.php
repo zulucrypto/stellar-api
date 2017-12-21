@@ -39,9 +39,6 @@ class AllowTrustOp extends Operation
     }
 
     /**
-     * Child classes MUST call this method to get the header for the operation
-     * and then append their body
-     *
      * @return string
      * @throws \ErrorException
      */

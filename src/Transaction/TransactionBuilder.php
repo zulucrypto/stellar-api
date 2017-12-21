@@ -12,6 +12,7 @@ use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 use ZuluCrypto\StellarSdk\XdrModel\AccountId;
 use ZuluCrypto\StellarSdk\XdrModel\Asset;
 use ZuluCrypto\StellarSdk\XdrModel\Memo;
+use ZuluCrypto\StellarSdk\XdrModel\Operation\AccountMergeOp;
 use ZuluCrypto\StellarSdk\XdrModel\Operation\AllowTrustOp;
 use ZuluCrypto\StellarSdk\XdrModel\Operation\ChangeTrustOp;
 use ZuluCrypto\StellarSdk\XdrModel\Operation\CreateAccountOp;
@@ -226,6 +227,21 @@ class TransactionBuilder implements XdrEncodableInterface
         $op->setIsAuthorized(false);
 
         return $this->addOperation($op);
+    }
+
+    /**
+     * Adds an operation to merge the balance of the source account to $destinationAccountId
+     * @param      $destinationAccountId
+     * @param null $sourceAccountId
+     * @return TransactionBuilder
+     */
+    public function addMergeOperation($destinationAccountId, $sourceAccountId = null)
+    {
+        if ($destinationAccountId instanceof Keypair) {
+            $destinationAccountId = $destinationAccountId->getPublicKey();
+        }
+
+        return $this->addOperation(new AccountMergeOp($destinationAccountId, $sourceAccountId));
     }
 
     /**
