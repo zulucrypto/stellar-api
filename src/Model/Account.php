@@ -231,6 +231,20 @@ class Account extends RestApiModel
         });
     }
 
+    /**
+     * Returns a string representing the native balance
+     *
+     * @return string
+     */
+    public function getNativeBalance()
+    {
+        foreach ($this->getBalances() as $balance) {
+            if ($balance->isNativeAsset()) return $balance->getBalanceString();
+        }
+
+        return "0";
+    }
+
     public function getSequence()
     {
         return $this->sequence;
