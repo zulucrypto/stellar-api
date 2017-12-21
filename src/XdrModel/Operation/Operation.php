@@ -39,7 +39,7 @@ abstract class Operation implements XdrEncodableInterface
     const TYPE_CHANGE_TRUST         = 6;
     const TYPE_ALLOW_TRUST          = 7;
     const TYPE_ACCOUNT_MERGE        = 8;
-    const TYPE_INFLATION            = 8;
+    const TYPE_INFLATION            = 9;
     const TYPE_MANAGE_DATA          = 10;
 
     /**
