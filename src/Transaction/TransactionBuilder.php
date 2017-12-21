@@ -4,12 +4,17 @@
 namespace ZuluCrypto\StellarSdk\Transaction;
 
 use ZuluCrypto\StellarSdk\Horizon\ApiClient;
+use ZuluCrypto\StellarSdk\Util\MathSafety;
 use ZuluCrypto\StellarSdk\Xdr\Iface\XdrEncodableInterface;
 use ZuluCrypto\StellarSdk\Xdr\Type\VariableArray;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 use ZuluCrypto\StellarSdk\XdrModel\AccountId;
+use ZuluCrypto\StellarSdk\XdrModel\Asset;
 use ZuluCrypto\StellarSdk\XdrModel\Memo;
+use ZuluCrypto\StellarSdk\XdrModel\Operation\ChangeTrustOp;
+use ZuluCrypto\StellarSdk\XdrModel\Operation\CreateAccountOp;
 use ZuluCrypto\StellarSdk\XdrModel\Operation\Operation;
+use ZuluCrypto\StellarSdk\XdrModel\Operation\PaymentOp;
 use ZuluCrypto\StellarSdk\XdrModel\TimeBounds;
 use ZuluCrypto\StellarSdk\XdrModel\TransactionEnvelope;
 
@@ -137,27 +142,62 @@ class TransactionBuilder implements XdrEncodableInterface
     }
 
     /**
+     * @param string  $newAccountId
+     * @param int     $amount
+     * @param string  $sourceAccountId
+     * @return TransactionBuilder
+     */
+    public function addCreateAccountOp($newAccountId, $amount, $sourceAccountId = null)
+    {
+        return $this->addOperation(new CreateAccountOp(new AccountId($newAccountId), $amount, $sourceAccountId));
+    }
+
+    /**
+     * @param Asset $asset
+     * @param       $amount
+     * @param       $destinationAccountId
+     * @return TransactionBuilder
+     */
+    public function addCustomAssetPaymentOp(Asset $asset, $amount, $destinationAccountId)
+    {
+        return $this->addOperation(
+            PaymentOp::newCustomPayment(null, $destinationAccountId, $amount, $asset->getAssetCode(), $asset->getIssuer()->getAccountIdString())
+        );
+    }
+
+    /**
+     * @param Asset $asset
+     * @param       $amount
+     * @param null  $sourceAccountId
+     * @return TransactionBuilder
+     */
+    public function addChangeTrustOp(Asset $asset, $amount, $sourceAccountId = null)
+    {
+        return $this->addOperation(new ChangeTrustOp($asset, $amount, $sourceAccountId));
+    }
+
+    /**
      * @return string
      */
     public function toXdr()
     {
         $bytes = '';
 
-        // Account ID
+        // Account ID (36 bytes)
         $bytes .= $this->accountId->toXdr();
-        // Fee
+        // Fee (4 bytes)
         $bytes .= XdrEncoder::unsignedInteger($this->getFee());
-        // Sequence number
+        // Sequence number (8 bytes)
         $bytes .= XdrEncoder::unsignedInteger64($this->generateSequenceNumber());
-        // Time Bounds
+        // Time Bounds (4 bytes if empty, 20 bytes if set)
         $bytes .= $this->timeBounds->toXdr();
-        // Memo
+        // Memo (4 bytes if empty, 36 bytes maximum)
         $bytes .= $this->memo->toXdr();
 
         // Operations
         $bytes .= $this->operations->toXdr();
 
-        // TransactionExt (not used? encoded as an empty union)
+        // TransactionExt (union reserved for future use)
         $bytes .= XdrEncoder::unsignedInteger(0);
 
         return $bytes;
@@ -170,6 +210,82 @@ class TransactionBuilder implements XdrEncodableInterface
     public function addOperation($operation)
     {
         $this->operations->append($operation);
+
+        return $this;
+    }
+
+    /**
+     * @param $memo
+     * @return $this
+     */
+    public function setTextMemo($memo)
+    {
+        $this->memo = new Memo(Memo::MEMO_TYPE_TEXT, $memo);
+
+        return $this;
+    }
+
+    /**
+     * @param $memo
+     * @return $this
+     */
+    public function setIdMemo($memo)
+    {
+        $this->memo = new Memo(Memo::MEMO_TYPE_ID, $memo);
+
+        return $this;
+    }
+
+    /**
+     * Note: this should be called with the raw sha256 hash
+     *
+     * For example:
+     *  $builder->setHashMemo(hash('sha256', 'example thing being hashed', true));
+     *
+     * @param $memo 32-byte sha256 hash
+     * @return $this
+     */
+    public function setHashMemo($memo)
+    {
+        $this->memo = new Memo(Memo::MEMO_TYPE_HASH, $memo);
+
+        return $this;
+    }
+
+    /**
+     * Note: this should be called with the raw sha256 hash
+     *
+     * For example:
+     *  $builder->setReturnMemo(hash('sha256', 'example thing being hashed', true));
+     *
+     * @param $memo 32-byte sha256 hash
+     * @return $this
+     */
+    public function setReturnMemo($memo)
+    {
+        $this->memo = new Memo(Memo::MEMO_TYPE_RETURN, $memo);
+
+        return $this;
+    }
+
+    /**
+     * @param \DateTime $lowerTimebound
+     * @return $this
+     */
+    public function setLowerTimebound(\DateTime $lowerTimebound)
+    {
+        $this->timeBounds->setMinTime($lowerTimebound);
+
+        return $this;
+    }
+
+    /**
+     * @param \DateTime $upperTimebound
+     * @return $this
+     */
+    public function setUpperTimebound(\DateTime $upperTimebound)
+    {
+        $this->timeBounds->setMaxTime($upperTimebound);
 
         return $this;
     }
