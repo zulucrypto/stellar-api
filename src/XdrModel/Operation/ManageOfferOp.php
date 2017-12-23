@@ -4,7 +4,9 @@
 namespace ZuluCrypto\StellarSdk\XdrModel\Operation;
 
 
+use phpseclib\Math\BigInteger;
 use ZuluCrypto\StellarSdk\Model\AssetAmount;
+use ZuluCrypto\StellarSdk\Model\StellarAmount;
 use ZuluCrypto\StellarSdk\Util\Debug;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 use ZuluCrypto\StellarSdk\XdrModel\AccountId;
@@ -32,7 +34,7 @@ class ManageOfferOp extends Operation
 
     /**
      *
-     * @var int
+     * @var StellarAmount
      */
     protected $amount;
 
@@ -46,13 +48,23 @@ class ManageOfferOp extends Operation
      */
     protected $offerId;
 
+    /**
+     * ManageOfferOp constructor.
+     *
+     * @param Asset $sellingAsset
+     * @param Asset $buyingAsset
+     * @param int|BigInteger $amount int representing lumens or BigInteger representing stroops
+     * @param Price $price
+     * @param null  $offerId
+     * @param null  $sourceAccount
+     */
     public function __construct(Asset $sellingAsset, Asset $buyingAsset, $amount, Price $price, $offerId = null, $sourceAccount = null)
     {
         parent::__construct(Operation::TYPE_MANAGE_OFFER, $sourceAccount);
 
         $this->sellingAsset = $sellingAsset;
         $this->buyingAsset = $buyingAsset;
-        $this->amount = $amount;
+        $this->amount = new StellarAmount($amount);
         $this->price = $price;
         $this->offerId = $offerId;
     }
@@ -106,7 +118,7 @@ class ManageOfferOp extends Operation
     }
 
     /**
-     * @return int
+     * @return StellarAmount
      */
     public function getAmount()
     {

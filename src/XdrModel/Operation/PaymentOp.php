@@ -6,6 +6,7 @@ namespace ZuluCrypto\StellarSdk\XdrModel\Operation;
 
 use phpseclib\Math\BigInteger;
 use ZuluCrypto\StellarSdk\Keypair;
+use ZuluCrypto\StellarSdk\Util\Debug;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 use ZuluCrypto\StellarSdk\XdrModel\AccountId;
 use ZuluCrypto\StellarSdk\XdrModel\Asset;
@@ -76,7 +77,7 @@ class PaymentOp extends Operation
 
         $bytes .= $this->destination->toXdr();
         $bytes .= $this->asset->toXdr();
-        $bytes .= XdrEncoder::integer64RawBytes($this->amount->toBytes(true));
+        $bytes .= XdrEncoder::signedBigInteger64($this->amount);
 
         return $bytes;
     }
@@ -101,5 +102,21 @@ class PaymentOp extends Operation
         else {
             $this->amount = $scaledAmountOrBigInteger;
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getAmount()
+    {
+        return $this->amount->toString();
+    }
+
+    /**
+     * @param BigInteger $stroops
+     */
+    public function setAmountInStroops(BigInteger $stroops)
+    {
+        $this->amount = $stroops;
     }
 }

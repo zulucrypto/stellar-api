@@ -3,7 +3,8 @@
 
 namespace ZuluCrypto\StellarSdk\XdrModel\Operation;
 
-use ZuluCrypto\StellarSdk\Util\Debug;
+use phpseclib\Math\BigInteger;
+use ZuluCrypto\StellarSdk\Model\StellarAmount;
 use ZuluCrypto\StellarSdk\Util\MathSafety;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 use ZuluCrypto\StellarSdk\XdrModel\AccountId;
@@ -23,18 +24,23 @@ class ChangeTrustOp extends Operation
     protected $asset;
 
     /**
-     * @var int
+     * @var StellarAmount
      */
     protected $limit;
 
+    /**
+     * ChangeTrustOp constructor.
+     *
+     * @param Asset          $asset
+     * @param int|BigInteger $limit int representing lumens or BigInteger representing stroops
+     * @param AccountId|null $sourceAccount
+     */
     public function __construct(Asset $asset, $limit, AccountId $sourceAccount = null)
     {
-        MathSafety::require64Bit();
-
         parent::__construct(Operation::TYPE_CHANGE_TRUST, $sourceAccount);
 
         $this->asset = $asset;
-        $this->limit = $limit;
+        $this->setLimit($limit);
     }
 
     public function toXdr()
@@ -42,7 +48,7 @@ class ChangeTrustOp extends Operation
         $bytes = parent::toXdr();
 
         $bytes .= $this->asset->toXdr();
-        $bytes .= XdrEncoder::unsignedInteger64($this->limit);
+        $bytes .= XdrEncoder::signedInteger64($this->limit);
 
         return $bytes;
     }
@@ -52,11 +58,11 @@ class ChangeTrustOp extends Operation
      */
     public function setMaxLimit()
     {
-        $this->limit = PHP_INT_MAX;
+        $this->limit = StellarAmount::newMaximum();
     }
 
     /**
-     * @return int
+     * @return StellarAmount
      */
     public function getLimit()
     {
@@ -64,11 +70,11 @@ class ChangeTrustOp extends Operation
     }
 
     /**
-     * @param int $limit
+     * @param int|BigInteger $limit int representing lumens or BigInteger representing stroops
      */
     public function setLimit($limit)
     {
-        $this->limit = $limit;
+        $this->limit = new StellarAmount($limit);
     }
 
     /**

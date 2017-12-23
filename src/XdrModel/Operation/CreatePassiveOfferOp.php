@@ -4,7 +4,9 @@
 namespace ZuluCrypto\StellarSdk\XdrModel\Operation;
 
 
+use phpseclib\Math\BigInteger;
 use ZuluCrypto\StellarSdk\Model\AssetAmount;
+use ZuluCrypto\StellarSdk\Model\StellarAmount;
 use ZuluCrypto\StellarSdk\Util\Debug;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 use ZuluCrypto\StellarSdk\XdrModel\AccountId;
@@ -30,7 +32,7 @@ class CreatePassiveOfferOp extends Operation
 
     /**
      *
-     * @var int
+     * @var StellarAmount
      */
     protected $amount;
 
@@ -41,13 +43,22 @@ class CreatePassiveOfferOp extends Operation
      */
     protected $price;
 
+    /**
+     * CreatePassiveOfferOp constructor.
+     *
+     * @param Asset $sellingAsset
+     * @param Asset $buyingAsset
+     * @param int|BigInteger $amount int representing lumens or BigInteger representing stroops
+     * @param Price $price
+     * @param null  $sourceAccount
+     */
     public function __construct(Asset $sellingAsset, Asset $buyingAsset, $amount, Price $price, $sourceAccount = null)
     {
         parent::__construct(Operation::TYPE_CREATE_PASSIVE_OFFER, $sourceAccount);
 
         $this->sellingAsset = $sellingAsset;
         $this->buyingAsset = $buyingAsset;
-        $this->amount = $amount;
+        $this->amount = new StellarAmount($amount);
         $this->price = $price;
     }
 
@@ -60,7 +71,7 @@ class CreatePassiveOfferOp extends Operation
 
         $bytes .= $this->sellingAsset->toXdr();
         $bytes .= $this->buyingAsset->toXdr();
-        $bytes .= XdrEncoder::signedInteger64($this->amount * AssetAmount::ASSET_SCALE);
+        $bytes .= XdrEncoder::signedBigInteger64($this->amount->getUnscaledBigInteger());
         $bytes .= $this->price->toXdr();
 
         return $bytes;
@@ -99,7 +110,7 @@ class CreatePassiveOfferOp extends Operation
     }
 
     /**
-     * @return int
+     * @return StellarAmount
      */
     public function getAmount()
     {

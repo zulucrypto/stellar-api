@@ -3,8 +3,8 @@
 
 namespace ZuluCrypto\StellarSdk\XdrModel\Operation;
 
-use ZuluCrypto\StellarSdk\Model\AssetAmount;
-use ZuluCrypto\StellarSdk\Util\MathSafety;
+use phpseclib\Math\BigInteger;
+use ZuluCrypto\StellarSdk\Model\StellarAmount;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 use ZuluCrypto\StellarSdk\XdrModel\AccountId;
 
@@ -21,24 +21,22 @@ class CreateAccountOp extends Operation
     protected $newAccount;
 
     /**
-     * @var int
+     * @var StellarAmount
      */
     protected $startingBalance;
 
     /**
      * @param AccountId      $newAccount
-     * @param                $startingBalance
+     * @param int|BigInteger $startingBalance int representing lumens or BigInteger representing stroops
      * @param AccountId|null $sourceAccount
      * @throws \ErrorException
      */
     public function __construct(AccountId $newAccount, $startingBalance, AccountId $sourceAccount = null)
     {
-        MathSafety::require64Bit();
-
         parent::__construct( Operation::TYPE_CREATE_ACCOUNT, $sourceAccount);
 
         $this->newAccount = $newAccount;
-        $this->startingBalance = $startingBalance;
+        $this->startingBalance = new StellarAmount($startingBalance);
     }
 
     /**
@@ -49,7 +47,7 @@ class CreateAccountOp extends Operation
         $bytes = parent::toXdr();
 
         $bytes .= $this->newAccount->toXdr();
-        $bytes .= XdrEncoder::signedInteger64($this->startingBalance * AssetAmount::ASSET_SCALE);
+        $bytes .= XdrEncoder::signedBigInteger64($this->startingBalance->getUnscaledBigInteger());
 
         return $bytes;
     }
