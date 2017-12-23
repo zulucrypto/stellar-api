@@ -18,10 +18,10 @@ use ZuluCrypto\StellarSdk\Util\MathSafety;
  */
 class StellarAmount
 {
-    const STROOP_SCALE = 10000000; // 10 million
+    const STROOP_SCALE = 10000000; // 10 million, 7 zeroes
 
     /**
-     * @var int signed int64
+     * @var BigInteger
      */
     protected $stroops;
 
@@ -64,7 +64,12 @@ class StellarAmount
         if ($lumensOrBigIntegerStroops instanceof BigInteger) {
             $this->stroops = $lumensOrBigIntegerStroops;
         }
+        // Can also pass in another StellarAmount
+        else if ($lumensOrBigIntegerStroops instanceof StellarAmount) {
+            $this->stroops = clone $lumensOrBigIntegerStroops->getUnscaledBigInteger();
+        }
         else {
+            $lumensOrBigIntegerStroops = number_format($lumensOrBigIntegerStroops, 7, '.', '');
             $parts = explode('.', $lumensOrBigIntegerStroops);
             $unscaledAmount = new BigInteger('0');
 
@@ -107,7 +112,8 @@ class StellarAmount
         /** @var $remainder BigInteger */
         list($quotient, $remainder) = $this->stroops->divide($this->stroopScaleBignum);
 
-        return intval($quotient->toString()) + (intval($remainder->toString()) / intval($this->stroopScaleBignum->toString()));
+        $number = intval($quotient->toString()) + (intval($remainder->toString()) / intval($this->stroopScaleBignum->toString()));
+        return number_format($number, 7, '.', '');
     }
 
     /**

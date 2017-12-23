@@ -24,7 +24,7 @@ class AssetAmount
     private $assetType;
 
     /**
-     * @var BigInteger
+     * @var StellarAmount
      */
     private $amount;
 
@@ -52,39 +52,16 @@ class AssetAmount
      *
      * See: https://www.stellar.org/developers/guides/concepts/assets.html
      *
-     * This class stores the balance internally as a BigInteger
+     * This class stores the balance internally as a StellarAmount
      *
-     * @param string $scaledAmountOrUnscaledBigInteger
+     * @param number|BigInteger $amount
      * @param string $assetType
      */
-    public function __construct($scaledAmountOrUnscaledBigInteger, $assetType = 'native')
+    public function __construct($amount, $assetType = 'native')
     {
         $this->assetType = $assetType;
 
-        // todo: move this to setAmount()
-        // If the amount is not a BigInteger it needs to be converted to one
-        if (!$scaledAmountOrUnscaledBigInteger instanceof BigInteger) {
-            $parts = explode('.', $scaledAmountOrUnscaledBigInteger);
-            $unscaledAmount = new BigInteger('0');
-
-            // Everything to the left of the decimal point
-            if ($parts[0]) {
-                $unscaledAmountLeft = (new BigInteger($parts[0]))->multiply(new BigInteger(self::ASSET_SCALE));
-                $unscaledAmount = $unscaledAmount->add($unscaledAmountLeft);
-            }
-
-            // Add everything to the right of the decimal point
-            if (count($parts) == 2 && str_replace('0', '', $parts[1]) != '') {
-                // Should be a total of 7 decimal digits to the right of the decimal
-                $unscaledAmountRight = str_pad($parts[1], 7, STR_PAD_RIGHT);
-                $unscaledAmount = $unscaledAmount->add(new BigInteger($unscaledAmountRight));
-            }
-
-            $this->amount = $unscaledAmount;
-        }
-        else {
-            $this->amount = $scaledAmountOrUnscaledBigInteger;
-        }
+        $this->amount = new StellarAmount($amount);
     }
 
     public function __toString()
@@ -124,29 +101,27 @@ class AssetAmount
     }
 
     /**
-     * @return BigInteger
+     * @return string
      */
     public function getUnscaledBalance()
     {
-        return $this->amount;
+        return $this->amount->getUnscaledString();
     }
 
     /**
-     * @return string
+     * @return number
      */
-    public function getBalanceString()
+    public function getBalance()
     {
-        list($quotient, $remainder) = $this->amount->divide(new BigInteger(self::ASSET_SCALE));
-
-        return ($remainder->value) ? sprintf('%s.%s', $quotient, $remainder) : $quotient;
+        return $this->amount->getScaledValue();
     }
 
     /**
-     * @param BigInteger $amount
+     * @param number|BigInteger $amount
      */
     public function setAmount($amount)
     {
-        $this->amount = $amount;
+        $this->amount = new StellarAmount($amount);
     }
 
     /**

@@ -7,6 +7,8 @@ namespace ZuluCrypto\StellarSdk\Model;
 use phpseclib\Math\BigInteger;
 use ZuluCrypto\StellarSdk\Horizon\Api\HorizonResponse;
 use ZuluCrypto\StellarSdk\Transaction\TransactionBuilder;
+use ZuluCrypto\StellarSdk\Util\MathSafety;
+use ZuluCrypto\StellarSdk\XdrModel\Asset;
 use ZuluCrypto\StellarSdk\XdrModel\Operation\PaymentOp;
 
 /**
@@ -235,14 +237,74 @@ class Account extends RestApiModel
      * Returns a string representing the native balance
      *
      * @return string
+     * @throws \ErrorException
      */
     public function getNativeBalance()
     {
+        MathSafety::require64Bit();
+
         foreach ($this->getBalances() as $balance) {
-            if ($balance->isNativeAsset()) return $balance->getBalanceString();
+            if ($balance->isNativeAsset()) return $balance->getBalance();
+        }
+
+        return 0;
+    }
+
+    /**
+     * Returns the balance in stroops
+     *
+     * @return string
+     * @throws \ErrorException
+     */
+    public function getNativeBalanceStroops()
+    {
+        MathSafety::require64Bit();
+
+        foreach ($this->getBalances() as $balance) {
+            if ($balance->isNativeAsset()) return $balance->getUnscaledBalance();
         }
 
         return "0";
+    }
+
+    /**
+     * @param Asset $asset
+     * @return null|string
+     * @throws \ErrorException
+     */
+    public function getCustomAssetBalance(Asset $asset)
+    {
+        MathSafety::require64Bit();
+
+        foreach ($this->getBalances() as $balance) {
+            if ($balance->getAssetCode() !== $asset->getAssetCode()) continue;
+            if ($balance->getAssetIssuerAccountId() != $asset->getIssuer()->getAccountIdString()) continue;
+
+            return $balance->getBalance();
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the balance of a custom asset in stroops
+     *
+     * @param Asset $asset
+     * @return null|string
+     * @throws \ErrorException
+     */
+    public function getCustomAssetBalanceStroops(Asset $asset)
+    {
+        MathSafety::require64Bit();
+
+        foreach ($this->getBalances() as $balance) {
+            if ($balance->getAssetCode() !== $asset->getAssetCode()) continue;
+            if ($balance->getAssetIssuerAccountId() != $asset->getIssuer()->getAccountIdString()) continue;
+
+            return $balance->getUnscaledBalance();
+        }
+
+        return null;
     }
 
     public function getSequence()

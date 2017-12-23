@@ -6,7 +6,7 @@ namespace ZuluCrypto\StellarSdk\XdrModel\Operation;
 
 use phpseclib\Math\BigInteger;
 use ZuluCrypto\StellarSdk\Keypair;
-use ZuluCrypto\StellarSdk\Util\Debug;
+use ZuluCrypto\StellarSdk\Model\StellarAmount;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 use ZuluCrypto\StellarSdk\XdrModel\AccountId;
 use ZuluCrypto\StellarSdk\XdrModel\Asset;
@@ -24,16 +24,23 @@ class PaymentOp extends Operation
     private $asset;
 
     /**
-     * @var BigInteger Int64 (signed)
+     * @var StellarAmount
      */
     private $amount;
 
-    public static function newNativePayment($sourceAccountId, $destinationAccountId, $amount)
+    /**
+     * @param $destinationAccountId
+     * @param $amount
+     * @param null|string|Keypair $sourceAccountId
+     * @return PaymentOp
+     */
+    public static function newNativePayment($destinationAccountId, $amount, $sourceAccountId = null)
     {
-        $sourceAccount = null;
-        if ($sourceAccountId) $sourceAccount = new AccountId($sourceAccountId);
+        if ($destinationAccountId instanceof Keypair) {
+            $destinationAccountId = $destinationAccountId->getPublicKey();
+        }
 
-        $op = new PaymentOp($sourceAccount);
+        $op = new PaymentOp($sourceAccountId);
         $op->destination = new AccountId($destinationAccountId);
         $op->asset = Asset::newNativeAsset();
         $op->setAmount($amount);
@@ -42,23 +49,16 @@ class PaymentOp extends Operation
     }
 
     /**
-     * @param $sourceAccountId
      * @param $destinationAccountId string|Keypair
      * @param $amount
      * @param $assetCode
      * @param $assetIssuerId
+     * @param $sourceAccountId
      * @return PaymentOp
      */
-    public static function newCustomPayment($sourceAccountId, $destinationAccountId, $amount, $assetCode, $assetIssuerId)
+    public static function newCustomPayment($destinationAccountId, $amount, $assetCode, $assetIssuerId, $sourceAccountId = null)
     {
-        $sourceAccount = null;
-        if ($sourceAccountId) $sourceAccount = new AccountId($sourceAccountId);
-
-        if ($destinationAccountId instanceof Keypair) {
-            $destinationAccountId = $destinationAccountId->getPublicKey();
-        }
-
-        $op = new PaymentOp($sourceAccount);
+        $op = new PaymentOp($sourceAccountId);
         $op->destination = new AccountId($destinationAccountId);
         $op->setAmount($amount);
         $op->asset = Asset::newCustomAsset($assetCode, $assetIssuerId);
@@ -66,8 +66,20 @@ class PaymentOp extends Operation
         return $op;
     }
 
-    public function __construct(AccountId $sourceAccount = null)
+    /**
+     * PaymentOp constructor.
+     *
+     * @param null|string|Keypair $sourceAccount
+     */
+    public function __construct($sourceAccount = null)
     {
+        if (is_string($sourceAccount)) {
+            $sourceAccount = new AccountId($sourceAccount);
+        }
+        if ($sourceAccount instanceof Keypair) {
+            $sourceAccount = new AccountId($sourceAccount->getPublicKey());
+        }
+
         parent::__construct(Operation::TYPE_PAYMENT, $sourceAccount);
     }
 
@@ -77,39 +89,25 @@ class PaymentOp extends Operation
 
         $bytes .= $this->destination->toXdr();
         $bytes .= $this->asset->toXdr();
-        $bytes .= XdrEncoder::signedBigInteger64($this->amount);
+        $bytes .= XdrEncoder::signedBigInteger64($this->amount->getUnscaledBigInteger());
 
         return $bytes;
     }
 
     /**
-     * @param string|BigInteger $scaledAmountOrBigInteger
+     * @param int|BigInteger $amount int representing lumens or BigInteger representing stroops
      */
-    public function setAmount($scaledAmountOrBigInteger)
+    public function setAmount($amount)
     {
-        if (!is_string($scaledAmountOrBigInteger) && !$scaledAmountOrBigInteger instanceof BigInteger) {
-            if ($scaledAmountOrBigInteger > PHP_INT_MAX) {
-                throw new \InvalidArgumentException(sprintf("you must pass a string to this method since amount is greater than PHP_INT_MAX"));
-            }
-        }
-
-        // A string or integer
-        if (!$scaledAmountOrBigInteger instanceof BigInteger) {
-            $scaledAmountOrBigInteger = new BigInteger($scaledAmountOrBigInteger);
-            $rawScale = new BigInteger("10000000");
-            $this->amount = $scaledAmountOrBigInteger->multiply($rawScale);
-        }
-        else {
-            $this->amount = $scaledAmountOrBigInteger;
-        }
+        $this->amount = new StellarAmount($amount);
     }
 
     /**
-     * @return string
+     * @return StellarAmount
      */
     public function getAmount()
     {
-        return $this->amount->toString();
+        return $this->amount;
     }
 
     /**
@@ -117,6 +115,6 @@ class PaymentOp extends Operation
      */
     public function setAmountInStroops(BigInteger $stroops)
     {
-        $this->amount = $stroops;
+        $this->amount = new StellarAmount($stroops);
     }
 }

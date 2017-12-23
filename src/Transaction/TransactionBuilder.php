@@ -3,8 +3,10 @@
 
 namespace ZuluCrypto\StellarSdk\Transaction;
 
+use phpseclib\Math\BigInteger;
 use ZuluCrypto\StellarSdk\Horizon\ApiClient;
 use ZuluCrypto\StellarSdk\Keypair;
+use ZuluCrypto\StellarSdk\Model\StellarAmount;
 use ZuluCrypto\StellarSdk\Util\MathSafety;
 use ZuluCrypto\StellarSdk\Xdr\Iface\XdrEncodableInterface;
 use ZuluCrypto\StellarSdk\Xdr\Type\VariableArray;
@@ -150,9 +152,20 @@ class TransactionBuilder implements XdrEncodableInterface
     }
 
     /**
-     * @param string  $newAccountId
-     * @param int     $amount
-     * @param string  $sourceAccountId
+     * @param string|Keypair          $destination
+     * @param number|BigInteger       $amount int representing lumens or BigInteger representing stroops
+     * @param null                    $sourceAccountId
+     * @return TransactionBuilder
+     */
+    public function addLumenPayment($destination, $amount, $sourceAccountId = null)
+    {
+        return $this->addOperation(PaymentOp::newNativePayment($destination, $amount, $sourceAccountId));
+    }
+
+    /**
+     * @param string            $newAccountId
+     * @param number|BigInteger $amount int representing lumens or BigInteger representing stroops
+     * @param string            $sourceAccountId
      * @return TransactionBuilder
      */
     public function addCreateAccountOp($newAccountId, $amount, $sourceAccountId = null)
@@ -161,28 +174,29 @@ class TransactionBuilder implements XdrEncodableInterface
     }
 
     /**
-     * @param Asset          $asset
-     * @param                $amount
-     * @param string|Keypair $destinationAccountId
+     * @param Asset               $asset
+     * @param number|BigInteger   $amount number representing lumens or BigInteger representing stroops
+     * @param string|Keypair      $destinationAccountId
+     * $param null|string|Keypair $sourceAccountId
      * @return TransactionBuilder
      */
-    public function addCustomAssetPaymentOp(Asset $asset, $amount, $destinationAccountId)
+    public function addCustomAssetPaymentOp(Asset $asset, $amount, $destinationAccountId, $sourceAccountId = null)
     {
         return $this->addOperation(
-            PaymentOp::newCustomPayment(null, $destinationAccountId, $amount, $asset->getAssetCode(), $asset->getIssuer()->getAccountIdString())
+            PaymentOp::newCustomPayment($destinationAccountId, $amount, $asset->getAssetCode(), $asset->getIssuer()->getAccountIdString(), $sourceAccountId)
         );
     }
 
     /**
      * @param Asset $asset
-     * @param int   $amount defaults to PHP_INT_MAX if null
+     * @param int   $amount defaults to maximum if null
      * @param null  $sourceAccountId
      * @return TransactionBuilder
      */
     public function addChangeTrustOp(Asset $asset, $amount = null, $sourceAccountId = null)
     {
         if ($amount === null) {
-            $amount = PHP_INT_MAX;
+            $amount = StellarAmount::newMaximum();
         }
 
         return $this->addOperation(new ChangeTrustOp($asset, $amount, $sourceAccountId));

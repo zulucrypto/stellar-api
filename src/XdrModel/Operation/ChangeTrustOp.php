@@ -48,7 +48,7 @@ class ChangeTrustOp extends Operation
         $bytes = parent::toXdr();
 
         $bytes .= $this->asset->toXdr();
-        $bytes .= XdrEncoder::signedInteger64($this->limit);
+        $bytes .= XdrEncoder::signedBigInteger64($this->limit->getUnscaledBigInteger());
 
         return $bytes;
     }

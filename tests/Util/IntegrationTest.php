@@ -3,8 +3,15 @@
 namespace ZuluCrypto\StellarSdk\Test\Util;
 
 use PHPUnit\Framework\TestCase;
+use ZuluCrypto\StellarSdk\Keypair;
 use ZuluCrypto\StellarSdk\Server;
+use ZuluCrypto\StellarSdk\XdrModel\Asset;
 
+/**
+ * Fixture data is setup in setup-integration-network.
+ *
+ * This class assumes access to a private network such as https://github.com/zulucrypto/docker-stellar-integration-test-network
+ */
 abstract class IntegrationTest extends TestCase
 {
     /**
@@ -22,13 +29,16 @@ abstract class IntegrationTest extends TestCase
     protected $networkPassword;
 
     /**
-     * Array of arrays with keys:
-     *  accountId - public account key
-     *  seed - private seed
+     * Array of Keypairs describing fixture accounts
      *
-     * @var array
+     * @var Keypair[]
      */
     protected $fixtureAccounts;
+
+    /**
+     * @var Asset[]
+     */
+    protected $fixtureAssets;
 
     /**
      * Default Server connected to the integrationnet
@@ -50,8 +60,21 @@ abstract class IntegrationTest extends TestCase
         }
 
         $this->fixtureAccounts = $this->getFixtureAccounts();
+        $this->fixtureAssets = $this->getFixtureAssets();
 
         $this->horizonServer = Server::customNet($this->horizonBaseUrl, $this->networkPassword);
+    }
+
+    /**
+     * @return Keypair
+     * @throws \ZuluCrypto\StellarSdk\Horizon\Exception\HorizonException
+     */
+    protected function getRandomFundedKeypair()
+    {
+        $keypair = Keypair::newFromRandom();
+        $this->horizonServer->fundAccount($keypair);
+
+        return $keypair;
     }
 
     /**
@@ -72,6 +95,20 @@ abstract class IntegrationTest extends TestCase
                 'accountId' => 'GAPSWEVEZVAOTW6AJM26NIVBITCKXNOMGBZAOPFTFDTJGKYCIIPVI4RJ',
                 'seed' => 'SBY7ZNSKQ3CDHH34RUWVIUCMM7UEWWFTCM6ORFT5QTE77JGDFCBGXSU5',
             ],
+            // GDJ7OPOMTHEUFEBT6VUR7ANXR6BOHKR754CZ3KMSIMQC43HHBEDVDWVG
+            'usdIssuingKeypair' => Keypair::newFromSeed('SBJXZEVYRX244HKDY6L5JZYPWDQW6D3WLEE3PTMQM4CSUKGE37J4AC3W'),
+            // GBTO25DHZJ43Z5UI3JDAUQMHKP3SVUKLLBSNN7TFR7MW3PCLPSW3SFQQ
+            'usdBankKeypair' => Keypair::newFromSeed('SDJOXTS4TE3Q3HUIFQK5AQCTRML6HIOUQIXDLCEQHICOFHU5CQN6DBLS'),
+        ];
+    }
+
+    /**
+     * Depends on getFixtureAccounts()
+     */
+    protected function getFixtureAssets()
+    {
+        return [
+            'usd' => Asset::newCustomAsset('USDTEST', $this->fixtureAccounts['usdIssuingKeypair']->getPublicKey()),
         ];
     }
 }
