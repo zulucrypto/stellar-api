@@ -9,6 +9,8 @@ use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 
 /**
  * https://github.com/stellar/stellar-core/blob/master/src/xdr/Stellar-ledger-entries.x#L47
+ *
+ * todo: implement ::fromNumber() for easy calculation of numerator and denominator
  */
 class Price implements XdrEncodableInterface
 {

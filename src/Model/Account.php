@@ -61,6 +61,7 @@ class Account extends RestApiModel
                 if (!$balance->isNativeAsset()) {
                     $balance->setAssetCode($rawBalance['asset_code']);
                     $balance->setAssetIssuerAccountId($rawBalance['asset_issuer']);
+                    $balance->setLimit($rawBalance['limit']);
                 }
 
                 $object->balances[] = $balance;
@@ -268,19 +269,36 @@ class Account extends RestApiModel
     }
 
     /**
+     * Returns the numeric balance of the given asset
+     *
      * @param Asset $asset
      * @return null|string
-     * @throws \ErrorException
      */
-    public function getCustomAssetBalance(Asset $asset)
+    public function getCustomAssetBalanceValue(Asset $asset)
     {
-        MathSafety::require64Bit();
-
         foreach ($this->getBalances() as $balance) {
             if ($balance->getAssetCode() !== $asset->getAssetCode()) continue;
             if ($balance->getAssetIssuerAccountId() != $asset->getIssuer()->getAccountIdString()) continue;
 
             return $balance->getBalance();
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns an AssetAmount representing the balance of this asset
+     *
+     * @param Asset $asset
+     * @return null|AssetAmount
+     */
+    public function getCustomAssetBalance(Asset $asset)
+    {
+        foreach ($this->getBalances() as $balance) {
+            if ($balance->getAssetCode() !== $asset->getAssetCode()) continue;
+            if ($balance->getAssetIssuerAccountId() != $asset->getIssuer()->getAccountIdString()) continue;
+
+            return $balance;
         }
 
         return null;

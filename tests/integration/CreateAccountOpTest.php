@@ -7,7 +7,7 @@ namespace ZuluCrypto\StellarSdk\Test\Integration;
 use ZuluCrypto\StellarSdk\Keypair;
 use ZuluCrypto\StellarSdk\Test\Util\IntegrationTest;
 
-class CreateAccountTest extends IntegrationTest
+class CreateAccountOpTest extends IntegrationTest
 {
     /**
      * @group requires-integrationnet

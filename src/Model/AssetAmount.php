@@ -43,6 +43,13 @@ class AssetAmount
     private $assetIssuerAccountId;
 
     /**
+     * The maximum amount of this asset that can be held
+     *
+     * @var StellarAmount
+     */
+    private $limit;
+
+    /**
      * AssetAmount constructor.
      *
      * $unscaledBalance is the balance with a decimal point. For example,
@@ -75,6 +82,22 @@ class AssetAmount
     public function isNativeAsset()
     {
         return self::ASSET_TYPE_NATIVE == $this->assetType;
+    }
+
+    /**
+     * @return StellarAmount
+     */
+    public function getLimit()
+    {
+        return $this->limit;
+    }
+
+    /**
+     * @param number|BigInteger $limit
+     */
+    public function setLimit($limit)
+    {
+        $this->limit = new StellarAmount($limit);
     }
 
     /**

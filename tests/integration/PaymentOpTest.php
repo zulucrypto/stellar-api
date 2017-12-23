@@ -113,7 +113,7 @@ class PaymentOpTest extends IntegrationTest
 
         $newBalance = $this->horizonServer
             ->getAccount($transferTo)
-            ->getCustomAssetBalance($usdAsset);
+            ->getCustomAssetBalanceValue($usdAsset);
 
         $this->assertEquals(922337203685.4775807, $newBalance);
     }
