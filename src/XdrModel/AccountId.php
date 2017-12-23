@@ -2,19 +2,8 @@
 
 namespace ZuluCrypto\StellarSdk\XdrModel;
 
-// Same thing as AccountId
-//
-//xdr.union("PublicKey", {
-//  switchOn: xdr.lookup("PublicKeyType"),
-//  switchName: "type",
-//  switches: [
-//    ["publicKeyTypeEd25519", "ed25519"],
-//],
-//  arms: {
-//    ed25519: xdr.lookup("Uint256"),
-//  },
-//});
 use ZuluCrypto\StellarSdk\AddressableKey;
+use ZuluCrypto\StellarSdk\Keypair;
 use ZuluCrypto\StellarSdk\Xdr\Iface\XdrEncodableInterface;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 
@@ -22,7 +11,6 @@ use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
  * This is the same thing as a PublicKey
  *
  * publicKeyTypeEd25519 - 0
- * ed25519 - ?? couldn't find definition
  *
  * Example encoding of publicKeyTypeEd25519 / GCN2K2HG53AWX2SP5UHRPMJUUHLJF2XBTGSXROTPWRGAYJCDDP63J2U6
  *
@@ -53,15 +41,22 @@ class AccountId implements XdrEncodableInterface
      */
     private $accountIdBytes;
 
+    /**
+     * @param string|Keypair $accountIdString
+     */
     public function __construct($accountIdString)
     {
-        if (!is_string($accountIdString)) {
-            throw new \InvalidArgumentException('Must pass a string for $accountIdString');
+        if ($accountIdString instanceof Keypair) {
+            $accountIdString = $accountIdString->getPublicKey();
         }
+
         $this->accountIdString = $accountIdString;
         $this->accountIdBytes = AddressableKey::getRawBytesFromBase32AccountId($accountIdString);
     }
 
+    /**
+     * @return string|Keypair
+     */
     public function getAccountIdString()
     {
         return $this->accountIdString;
