@@ -56,6 +56,23 @@ class AddressableKey
         return Base32::encode($version . $payload . $checksum);
     }
 
+    /**
+     * Converts $rawBytes into a public account ID (G...)
+     * 
+     * @param $rawBytes
+     * @return string
+     */
+    public static function addressFromRawBytes($rawBytes)
+    {
+        $version = pack('C', self::VERSION_BYTE_ACCOUNT_ID);
+
+        $payload = $rawBytes;
+
+        $checksum = Checksum::generate($version . $payload);
+
+        return Base32::encode($version . $payload . $checksum);
+    }
+
     public static function getRawBytesFromBase32Seed($base32Seed)
     {
         $decoded = Base32::decode($base32Seed);
