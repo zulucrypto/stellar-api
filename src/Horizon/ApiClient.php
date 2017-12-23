@@ -17,6 +17,7 @@ use ZuluCrypto\StellarSdk\Model\Payment;
 use ZuluCrypto\StellarSdk\Model\Transaction;
 use ZuluCrypto\StellarSdk\Transaction\TransactionBuilder;
 use ZuluCrypto\StellarSdk\Util\Hash;
+use ZuluCrypto\StellarSdk\Util\Json;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 use ZuluCrypto\StellarSdk\XdrModel\TransactionEnvelope;
 
