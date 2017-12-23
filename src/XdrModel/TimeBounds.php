@@ -4,6 +4,7 @@ namespace ZuluCrypto\StellarSdk\XdrModel;
 
 
 use ZuluCrypto\StellarSdk\AddressableKey;
+use ZuluCrypto\StellarSdk\Util\MathSafety;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 
 /**
@@ -26,8 +27,15 @@ class TimeBounds
      */
     private $maxTime;
 
+    /**
+     * @param null|number $minTime 64-bit unix timestamp
+     * @param null|number $maxTime 64-bit unix timestamp
+     * @throws \ErrorException
+     */
     public function __construct($minTime = null, $maxTime = null)
     {
+        MathSafety::require64Bit();
+
         $this->minTime = $minTime;
         $this->maxTime = $maxTime;
     }

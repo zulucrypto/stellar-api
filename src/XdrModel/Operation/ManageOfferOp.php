@@ -78,7 +78,7 @@ class ManageOfferOp extends Operation
 
         $bytes .= $this->sellingAsset->toXdr();
         $bytes .= $this->buyingAsset->toXdr();
-        $bytes .= XdrEncoder::signedInteger64($this->amount * AssetAmount::ASSET_SCALE);
+        $bytes .= XdrEncoder::signedBigInteger64($this->amount->getUnscaledBigInteger());
         $bytes .= $this->price->toXdr();
         $bytes .= XdrEncoder::unsignedInteger64($this->offerId);
 

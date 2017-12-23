@@ -4,7 +4,9 @@
 namespace ZuluCrypto\StellarSdk\XdrModel\Operation;
 
 
+use phpseclib\Math\BigInteger;
 use ZuluCrypto\StellarSdk\Keypair;
+use ZuluCrypto\StellarSdk\Model\StellarAmount;
 use ZuluCrypto\StellarSdk\Xdr\Type\VariableArray;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 use ZuluCrypto\StellarSdk\XdrModel\AccountId;
@@ -23,7 +25,7 @@ class PathPaymentOp extends Operation
     /**
      * maximum amount of $sendAsset to send (excluding fees)
      *
-     * @var int
+     * @var StellarAmount
      */
     protected $sendMax;
 
@@ -38,7 +40,7 @@ class PathPaymentOp extends Operation
     protected $destinationAsset;
 
     /**
-     * @var int
+     * @var StellarAmount
      */
     protected $destinationAmount;
 
@@ -47,6 +49,16 @@ class PathPaymentOp extends Operation
      */
     protected $paths;
 
+    /**
+     * PathPaymentOp constructor.
+     *
+     * @param Asset $sendAsset
+     * @param number|BigInteger      $sendMax number of XLM or BigInteger representing stroops
+     * @param       $destinationAccountId
+     * @param Asset $destinationAsset
+     * @param number|BigInteger      $destinationAmount
+     * @param       $sourceAccountId
+     */
     public function __construct(
         Asset $sendAsset,
         $sendMax,
@@ -62,10 +74,10 @@ class PathPaymentOp extends Operation
         }
 
         $this->sendAsset = $sendAsset;
-        $this->sendMax = $sendMax;
+        $this->sendMax = new StellarAmount($sendMax);
         $this->destinationAccount = new AccountId($destinationAccountId);
         $this->destinationAsset = $destinationAsset;
-        $this->destinationAmount = $destinationAmount;
+        $this->destinationAmount = new StellarAmount($destinationAmount);
 
         $this->paths = new VariableArray();
     }
@@ -82,7 +94,7 @@ class PathPaymentOp extends Operation
         $bytes .= $this->sendAsset->toXdr();
 
         // sendMax
-        $bytes .= XdrEncoder::signedInteger64($this->sendMax);
+        $bytes .= XdrEncoder::signedBigInteger64($this->sendMax->getUnscaledBigInteger());
 
         // Destination account
         $bytes .= $this->destinationAccount->toXdr();
@@ -91,7 +103,7 @@ class PathPaymentOp extends Operation
         $bytes .= $this->destinationAsset->toXdr();
 
         // Destination amount
-        $bytes .= XdrEncoder::signedInteger64($this->destinationAmount);
+        $bytes .= XdrEncoder::signedBigInteger64($this->destinationAmount->getUnscaledBigInteger());
 
         // Paths
         $bytes .= $this->paths->toXdr();
@@ -130,7 +142,7 @@ class PathPaymentOp extends Operation
     }
 
     /**
-     * @return int
+     * @return StellarAmount
      */
     public function getSendMax()
     {
@@ -138,11 +150,11 @@ class PathPaymentOp extends Operation
     }
 
     /**
-     * @param int $sendMax
+     * @param number|BigInteger $sendMax number of XLM or BigInteger representing stroops
      */
     public function setSendMax($sendMax)
     {
-        $this->sendMax = $sendMax;
+        $this->sendMax = new StellarAmount($sendMax);
     }
 
     /**
@@ -178,7 +190,7 @@ class PathPaymentOp extends Operation
     }
 
     /**
-     * @return int
+     * @return StellarAmount
      */
     public function getDestinationAmount()
     {
@@ -186,11 +198,11 @@ class PathPaymentOp extends Operation
     }
 
     /**
-     * @param int $destinationAmount
+     * @param number|BigInteger $destinationAmount number of XLM or BigInteger representing stroops
      */
     public function setDestinationAmount($destinationAmount)
     {
-        $this->destinationAmount = $destinationAmount;
+        $this->destinationAmount = new StellarAmount($destinationAmount);
     }
 
     /**
