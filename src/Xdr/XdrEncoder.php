@@ -3,6 +3,7 @@
 
 namespace ZuluCrypto\StellarSdk\Xdr;
 
+use phpseclib\Math\BigInteger;
 use ZuluCrypto\StellarSdk\Xdr\Iface\XdrEncodableInterface;
 
 
@@ -82,6 +83,41 @@ class XdrEncoder
         // pack() does not support a signed 64-byte int, so work around this with
         // custom encoding
         return (self::nativeIsBigEndian()) ? pack('q', $value) : strrev(pack('q', $value));
+    }
+
+    /**
+     * Converts $value to a signed 8-byte big endian int64
+     *
+     * @param BigInteger $value
+     * @return string
+     */
+    public static function signedBigInteger64(BigInteger $value)
+    {
+        $xdrBytes = '';
+        $bigIntBytes = $value->toBytes(true);
+        $bigIntBits = $value->toBits(true);
+
+        // Special case: MAX_UINT_64 will look like 00ffffffffffffffff and have an
+        // extra preceeding byte we need to get rid of
+        if (strlen($bigIntBytes) === 9 && substr($value->toHex(true), 0, 2) === '00') {
+            $bigIntBytes = substr($bigIntBytes, 1);
+        }
+
+        $paddingChar = chr(0);
+        // If the number is negative, pad with 0xFF
+        if (substr($bigIntBits, 0, 1) == 1) {
+            $paddingChar = chr(255);
+        }
+
+        $paddingBytes = 8 - strlen($bigIntBytes);
+        while ($paddingBytes > 0) {
+            $xdrBytes .= $paddingChar;
+            $paddingBytes--;
+        }
+
+        $xdrBytes .= $bigIntBytes;
+
+        return XdrEncoder::opaqueFixed($xdrBytes, 8);
     }
 
     /**
