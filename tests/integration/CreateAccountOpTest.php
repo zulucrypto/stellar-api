@@ -15,17 +15,17 @@ class CreateAccountOpTest extends IntegrationTest
     public function testCreateAccount()
     {
         /** @var Keypair $sourceKeypair */
-        $sourceKeypair = Keypair::newFromSeed($this->fixtureAccounts['basic1']['seed']);
+        $sourceKeypair = $this->fixtureAccounts['basic1'];
 
         $newKeypair = Keypair::newFromRandom();
 
         $this->horizonServer->buildTransaction($sourceKeypair->getPublicKey())
-            ->addCreateAccountOp($newKeypair->getAccountId(), 100)
+            ->addCreateAccountOp($newKeypair->getAccountId(), 100.0333)
             ->submit($sourceKeypair->getSecret());
 
         // Should then be able to retrieve the account and verify the balance
         $newAccount = $this->horizonServer->getAccount($newKeypair->getPublicKey());
 
-        $this->assertEquals("100", $newAccount->getNativeBalance());
+        $this->assertEquals("100.0333", $newAccount->getNativeBalance());
     }
 }

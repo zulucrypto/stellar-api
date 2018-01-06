@@ -22,7 +22,8 @@ class PathPaymentOpTest extends IntegrationTest
      */
     public function testSingleStepPathPayment()
     {
-        $sourceKeypair = Keypair::newFromSeed($this->fixtureAccounts['basic1']['seed']);
+        /** @var Keypair $sourceKeypair */
+        $sourceKeypair = $this->fixtureAccounts['basic1'];
         $destinationKeypair = $this->fixtureAccounts['jpyMerchantKeypair'];
 
         $usdAsset = $this->fixtureAssets['usd'];
@@ -36,7 +37,6 @@ class PathPaymentOpTest extends IntegrationTest
             ->addOperation($pathPayment)
             ->getTransactionEnvelope();
 
-
-        print base64_encode($envelope->toXdr());
+        // todo: need additional fixtures to verify path payment
     }
 }

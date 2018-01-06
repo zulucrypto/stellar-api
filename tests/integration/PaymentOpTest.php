@@ -19,8 +19,8 @@ class PaymentOpTest extends IntegrationTest
      */
     public function testNativePayment()
     {
-        $sourceKeypair = Keypair::newFromSeed($this->fixtureAccounts['basic1']['seed']);
-        $destinationKeypair = Keypair::newFromSeed($this->fixtureAccounts['basic2']['seed']);
+        $sourceKeypair = $this->fixtureAccounts['basic1'];
+        $destinationKeypair = $this->fixtureAccounts['basic2'];
 
         $prevBalance = $this->horizonServer
             ->getAccount($destinationKeypair)

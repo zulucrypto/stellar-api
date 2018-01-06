@@ -29,7 +29,7 @@ class CreatePassiveOfferOpTest extends IntegrationTest
             ->addOperation($offerOp)
             ->submit($usdBankKeypair);
 
-        // todo: add support for offers and verify here
-        // todo: verify canceling an offer
+        // todo: add support for viewing offers on an account and verify here
+        // todo: verify canceling an offer works correctly
     }
 }
