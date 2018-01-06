@@ -99,6 +99,13 @@ abstract class IntegrationTest extends TestCase
             'usdIssuingKeypair' => Keypair::newFromSeed('SBJXZEVYRX244HKDY6L5JZYPWDQW6D3WLEE3PTMQM4CSUKGE37J4AC3W'),
             // GBTO25DHZJ43Z5UI3JDAUQMHKP3SVUKLLBSNN7TFR7MW3PCLPSW3SFQQ
             'usdBankKeypair' => Keypair::newFromSeed('SDJOXTS4TE3Q3HUIFQK5AQCTRML6HIOUQIXDLCEQHICOFHU5CQN6DBLS'),
+
+            // GC5DIPGB56HFCAUTX27K3TENHB65VQ2RNH2DJ3KALEXJHR6STPICMC3Y
+            'jpyIssuingKeypair' => Keypair::newFromSeed('SDLK77FFXNCSTLXD6HMVGVR24FAK2GF6KX47I2FYOLRBCKPOD6TRW7V6'),
+            // GAFT3ZRCVXDFJLTKNU3C2I3UGW6HVNI65FX7LTMYB5DQDPOM4H7XZAT6
+            'jpyBankKeypair' => Keypair::newFromSeed('SCJ7RMMMCOOBTC77J5STNKV5EDAQDXXXPSDAOP66MBIIYLJYT7WZK2UN'),
+            // GBMAHYE3L74AKS36LLF3AGQC55AL4AVZMVCCLJZXL32U2WDBMSEOZPQJ
+            'jpyMerchantKeypair' => Keypair::newFromSeed('SAR6ZY7XFHBW5YYQGXSORBGIQH2AKSXQP3JPWPHEN3RSRTCMN6JBMYHS'),
         ];
     }
 
@@ -109,6 +116,7 @@ abstract class IntegrationTest extends TestCase
     {
         return [
             'usd' => Asset::newCustomAsset('USDTEST', $this->fixtureAccounts['usdIssuingKeypair']->getPublicKey()),
+            'jpy' => Asset::newCustomAsset('JPYTEST', $this->fixtureAccounts['jpyIssuingKeypair']->getPublicKey()),
         ];
     }
 }

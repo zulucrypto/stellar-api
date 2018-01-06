@@ -65,7 +65,7 @@ class PathPaymentOp extends Operation
         $destinationAccountId,
         Asset $destinationAsset,
         $destinationAmount,
-        $sourceAccountId
+        $sourceAccountId = null
     ) {
         parent::__construct(Operation::TYPE_PATH_PAYMENT, $sourceAccountId);
 
