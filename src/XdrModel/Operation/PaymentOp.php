@@ -30,7 +30,7 @@ class PaymentOp extends Operation
 
     /**
      * @param $destinationAccountId
-     * @param $amount
+     * @param $amount int|BigInteger int representing lumens or BigInteger representing stroops
      * @param null|string|Keypair $sourceAccountId
      * @return PaymentOp
      */

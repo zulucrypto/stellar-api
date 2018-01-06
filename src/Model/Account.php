@@ -79,10 +79,11 @@ class Account extends RestApiModel
     }
 
     /**
-     * @param $toAccountId
-     * @param $amount
+     * @param                 $toAccountId
+     * @param                 $amount
      * @param string|string[] $signingKeys
      * @return HorizonResponse
+     * @throws \ErrorException
      */
     public function sendNativeAsset($toAccountId, $amount, $signingKeys)
     {
@@ -100,7 +101,7 @@ class Account extends RestApiModel
     public function sendPayment(Payment $payment, $signingKeys)
     {
         if ($payment->isNativeAsset()) {
-            $paymentOp = PaymentOp::newNativePayment($this->accountId, $payment->getDestinationAccountId(), $payment->getAmount()->getUnscaledBalance());
+            $paymentOp = PaymentOp::newNativePayment($payment->getDestinationAccountId(), $payment->getAmount()->getBalanceAsStroops());
         }
         else {
             throw new \ErrorException('Not implemented');

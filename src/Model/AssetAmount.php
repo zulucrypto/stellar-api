@@ -140,6 +140,16 @@ class AssetAmount
     }
 
     /**
+     * Returns the stroop representation of this AssetAmount
+     *
+     * @return BigInteger
+     */
+    public function getBalanceAsStroops()
+    {
+        return $this->amount->getUnscaledBigInteger();
+    }
+
+    /**
      * @param number|BigInteger $amount
      */
     public function setAmount($amount)
