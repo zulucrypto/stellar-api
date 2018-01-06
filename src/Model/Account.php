@@ -149,8 +149,15 @@ class Account extends RestApiModel
         return $transactions;
     }
 
+    /**
+     * @param null $sinceCursor
+     * @param int  $limit
+     * @return array
+     * @throws \ZuluCrypto\StellarSdk\Horizon\Exception\HorizonException
+     */
     public function getEffects($sinceCursor = null, $limit = 50)
     {
+        $effects = [];
         $url = sprintf('/accounts/%s/effects', $this->accountId);
         $params = [];
 
@@ -162,8 +169,16 @@ class Account extends RestApiModel
         }
 
         $response = $this->apiClient->get($url);
+        $raw = $response->getRecords();
 
-        print_r($response->getRawData());
+        foreach ($raw as $rawEffect) {
+            $effect = Effect::fromRawResponseData($rawEffect);
+            $effect->setApiClient($this->getApiClient());
+
+            $effects[] = $effect;
+        }
+
+        return $effects;
     }
 
     /**
