@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- http://www.phpunit.de/manual/current/en/appendixes.configuration.html -->
+<!-- https://phpunit.de/manual/current/en/appendixes.configuration.html#appendixes.configuration.phpunit -->
 <phpunit
     backupGlobals               = "false"
     backupStaticAttributes      = "false"
@@ -23,6 +23,8 @@
         <exclude>
             <!-- Requires the integration network: https://github.com/zulucrypto/docker-stellar-integration-test-network -->
             <group>requires-integrationnet</group>
+            <!-- Requires a hardware wallet. See HardwareWalletIntegrationTest.php -->
+            <group>requires-hardwarewallet</group>
         </exclude>
     </groups>
 

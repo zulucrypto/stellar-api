@@ -54,6 +54,8 @@ abstract class IntegrationTest extends TestCase
             throw new \InvalidArgumentException('Environment variable STELLAR_HORIZON_BASE_URL must be defined');
         }
 
+        // Public : Public Global Stellar Network ; September 2015
+        // Testnet: Test SDF Network ; September 2015
         $this->networkPassword = getenv('STELLAR_NETWORK_PASSWORD');
         if (!$this->networkPassword) {
             $this->networkPassword = 'Integration Test Network ; zulucrypto';
