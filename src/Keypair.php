@@ -107,6 +107,10 @@ class Keypair
         $this->publicKey = AddressableKey::getRawBytesFromBase32AccountId($this->publicKeyString);
     }
 
+    /**
+     * @param $value
+     * @return DecoratedSignature
+     */
     public function signDecorated($value)
     {
         return new DecoratedSignature(
