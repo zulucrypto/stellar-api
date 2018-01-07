@@ -8,6 +8,7 @@ use ZuluCrypto\StellarSdk\Horizon\ApiClient;
 use ZuluCrypto\StellarSdk\Horizon\Exception\HorizonException;
 use ZuluCrypto\StellarSdk\Model\Account;
 use ZuluCrypto\StellarSdk\Model\Payment;
+use ZuluCrypto\StellarSdk\Signing\SigningInterface;
 use ZuluCrypto\StellarSdk\Transaction\TransactionBuilder;
 
 class Server
@@ -21,6 +22,12 @@ class Server
      * @var
      */
     private $isTestnet;
+
+
+    /**
+     * @var SigningInterface
+     */
+    protected $signingProvider;
 
     /**
      * @return Server
@@ -109,6 +116,7 @@ class Server
 
         return (new TransactionBuilder($accountId))
             ->setApiClient($this->apiClient)
+            ->setSigningProvider($this->signingProvider)
         ;
     }
 
@@ -163,5 +171,21 @@ class Server
     public function getHorizonBaseUrl()
     {
         return $this->apiClient->getBaseUrl();
+    }
+
+    /**
+     * @return SigningInterface
+     */
+    public function getSigningProvider()
+    {
+        return $this->signingProvider;
+    }
+
+    /**
+     * @param SigningInterface $signingProvider
+     */
+    public function setSigningProvider($signingProvider)
+    {
+        $this->signingProvider = $signingProvider;
     }
 }

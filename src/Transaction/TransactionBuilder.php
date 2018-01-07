@@ -7,12 +7,14 @@ use phpseclib\Math\BigInteger;
 use ZuluCrypto\StellarSdk\Horizon\ApiClient;
 use ZuluCrypto\StellarSdk\Keypair;
 use ZuluCrypto\StellarSdk\Model\StellarAmount;
+use ZuluCrypto\StellarSdk\Signing\SigningInterface;
 use ZuluCrypto\StellarSdk\Util\MathSafety;
 use ZuluCrypto\StellarSdk\Xdr\Iface\XdrEncodableInterface;
 use ZuluCrypto\StellarSdk\Xdr\Type\VariableArray;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 use ZuluCrypto\StellarSdk\XdrModel\AccountId;
 use ZuluCrypto\StellarSdk\XdrModel\Asset;
+use ZuluCrypto\StellarSdk\XdrModel\DecoratedSignature;
 use ZuluCrypto\StellarSdk\XdrModel\Memo;
 use ZuluCrypto\StellarSdk\XdrModel\Operation\AccountMergeOp;
 use ZuluCrypto\StellarSdk\XdrModel\Operation\AllowTrustOp;
@@ -89,6 +91,23 @@ class TransactionBuilder implements XdrEncodableInterface
     private $apiClient;
 
     /**
+     * @var SigningInterface
+     */
+    protected $signingProvider;
+
+    /**
+     * @var DecoratedSignature[]
+     */
+    protected $signatures;
+
+    /**
+     * If null, this is retrieved from the network
+     *
+     * @var BigInteger
+     */
+    protected $sequenceNumber;
+
+    /**
      * TransactionBuilder constructor.
      *
      * @param $sourceAccountId
@@ -102,7 +121,24 @@ class TransactionBuilder implements XdrEncodableInterface
         $this->memo = new Memo(Memo::MEMO_TYPE_NONE);
         $this->operations = new VariableArray();
 
+        $this->signatures = [];
+
         return $this;
+    }
+
+    /**
+     * Uses $signer to add a new DecoratedSignature to this TransactionBuilder
+     *
+     * @param SigningInterface $signer
+     * @return DecoratedSignature
+     */
+    public function signWith(SigningInterface $signer)
+    {
+        $decoratedSignature = $signer->signTransaction($this);
+
+        $this->signatures[] = $decoratedSignature;
+
+        return $decoratedSignature;
     }
 
     /**
@@ -110,16 +146,32 @@ class TransactionBuilder implements XdrEncodableInterface
      */
     public function getTransactionEnvelope()
     {
-        return new TransactionEnvelope($this);
+        $txEnvelope = new TransactionEnvelope($this);
+
+        foreach ($this->signatures as $signature) {
+            $txEnvelope->addDecoratedSignature($signature);
+        }
+
+        return $txEnvelope;
     }
 
     /**
      * @param $secretKeyString
      * @return TransactionEnvelope
      */
-    public function sign($secretKeyString)
+    public function sign($secretKeyString = null)
     {
-        return (new TransactionEnvelope($this))->sign($secretKeyString);
+        // If $secretKeyString is null, check for a SigningProvider
+        if (!$secretKeyString) {
+            if (!$this->signingProvider) throw new \ErrorException('$secretKeyString was empty and no signingProvider is set');
+
+            $this->signWith($this->signingProvider);
+
+            return $this->getTransactionEnvelope();
+        }
+        else {
+            return (new TransactionEnvelope($this))->sign($secretKeyString);
+        }
     }
 
     public function hash()
@@ -136,7 +188,7 @@ class TransactionBuilder implements XdrEncodableInterface
      * @param $secretKeyString string|Keypair
      * @return \ZuluCrypto\StellarSdk\Horizon\Api\HorizonResponse
      */
-    public function submit($secretKeyString)
+    public function submit($secretKeyString = null)
     {
         if ($secretKeyString instanceof Keypair) {
             $secretKeyString = $secretKeyString->getSecret();
@@ -287,12 +339,18 @@ class TransactionBuilder implements XdrEncodableInterface
     {
         $bytes = '';
 
+        // todo: $sequenceNumber should always be a BigInteger
+        $sequenceNumber = $this->sequenceNumber->toString();
+        if (!$sequenceNumber) {
+            $sequenceNumber = $this->generateSequenceNumber();
+        }
+
         // Account ID (36 bytes)
         $bytes .= $this->accountId->toXdr();
         // Fee (4 bytes)
         $bytes .= XdrEncoder::unsignedInteger($this->getFee());
         // Sequence number (8 bytes)
-        $bytes .= XdrEncoder::unsignedInteger64($this->generateSequenceNumber());
+        $bytes .= XdrEncoder::unsignedInteger64($sequenceNumber);
         // Time Bounds (4 bytes if empty, 20 bytes if set)
         $bytes .= $this->timeBounds->toXdr();
         // Memo (4 bytes if empty, 36 bytes maximum)
@@ -424,6 +482,42 @@ class TransactionBuilder implements XdrEncodableInterface
     public function setApiClient($apiClient)
     {
         $this->apiClient = $apiClient;
+
+        return $this;
+    }
+
+    /**
+     * @return SigningInterface
+     */
+    public function getSigningProvider()
+    {
+        return $this->signingProvider;
+    }
+
+    /**
+     * @param SigningInterface $signingProvider
+     */
+    public function setSigningProvider($signingProvider)
+    {
+        $this->signingProvider = $signingProvider;
+
+        return $this;
+    }
+
+    /**
+     * @return BigInteger
+     */
+    public function getSequenceNumber()
+    {
+        return $this->sequenceNumber;
+    }
+
+    /**
+     * @param BigInteger $sequenceNumber
+     */
+    public function setSequenceNumber($sequenceNumber)
+    {
+        $this->sequenceNumber = $sequenceNumber;
 
         return $this;
     }

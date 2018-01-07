@@ -34,4 +34,20 @@ class DecoratedSignature implements XdrEncodableInterface
 
         return $bytes;
     }
+
+    /**
+     * @return string
+     */
+    public function toBase64()
+    {
+        return base64_encode($this->toXdr());
+    }
+
+    /**
+     * @return string
+     */
+    public function getWithoutHintBase64()
+    {
+        return base64_encode($this->signature);
+    }
 }
