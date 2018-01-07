@@ -1,3 +1,7 @@
+### 0.2.1
+
+ * Fixed an issue where the private key was used instead of the public key when building signer XDR
+
 ### 0.2.0
 
 **Breaking Changes / Incompatibilities**

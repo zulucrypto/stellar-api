@@ -37,7 +37,7 @@ class SignerKey implements XdrEncodableInterface
     public static function fromKeypair(Keypair $keypair)
     {
         $signerKey = new SignerKey(static::TYPE_ED25519);
-        $signerKey->key = $keypair->getPrivateKeyBytes();
+        $signerKey->key = $keypair->getPublicKeyBytes();
 
         return $signerKey;
     }

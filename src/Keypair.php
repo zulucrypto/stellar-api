@@ -154,6 +154,14 @@ class Keypair
         return $this->publicKeyString;
     }
 
+    /**
+     * @return string
+     */
+    public function getPublicKeyBytes()
+    {
+        return $this->publicKey;
+    }
+
     public function getAccountId()
     {
         return $this->publicKeyString;
