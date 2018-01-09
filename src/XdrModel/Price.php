@@ -30,6 +30,11 @@ class Price implements XdrEncodableInterface
         $this->denominator = $denominator;
     }
 
+    public function __toString()
+    {
+        return strval($this->numerator / $this->denominator);
+    }
+
     public function toXdr()
     {
         $bytes = '';
