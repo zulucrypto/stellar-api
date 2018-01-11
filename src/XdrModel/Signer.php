@@ -42,4 +42,38 @@ class Signer implements XdrEncodableInterface
 
         return $bytes;
     }
+
+    /**
+     * @return SignerKey
+     */
+    public function getKey()
+    {
+        return $this->key;
+    }
+
+    /**
+     * @param SignerKey $key
+     */
+    public function setKey($key)
+    {
+        $this->key = $key;
+    }
+
+    /**
+     * @return int
+     */
+    public function getWeight()
+    {
+        return $this->weight;
+    }
+
+    /**
+     * @param int $weight
+     */
+    public function setWeight($weight)
+    {
+        if ($weight > 255 || $weight < 0) throw new \InvalidArgumentException('weight must be between 0 and 255');
+
+        $this->weight = $weight;
+    }
 }
