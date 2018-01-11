@@ -66,8 +66,8 @@ class SetOptionsOp extends Operation
     {
         parent::__construct(Operation::TYPE_SET_OPTIONS, $sourceAccountId);
 
-        $this->setFlags = 0;
-        $this->clearFlags = 0;
+        $this->setFlags = null;
+        $this->clearFlags = null;
 
         return $this;
     }
@@ -75,6 +75,10 @@ class SetOptionsOp extends Operation
     public function toXdr()
     {
         $bytes = parent::toXdr();
+
+        // Treat 0 flags as null
+        if ($this->setFlags === 0) $this->setFlags = null;
+        if ($this->clearFlags === 0) $this->clearFlags = null;
 
         // inflation destination
         $bytes .= XdrEncoder::optional($this->inflationDestinationAccount);
@@ -189,7 +193,7 @@ class SetOptionsOp extends Operation
      */
     public function setLowThreshold($threshold)
     {
-        if ($threshold < 0 || $threshold > (2^32-1)) throw new \InvalidArgumentException('$threshold must be between 0 and ' . (2^32-1));
+        if ($threshold < 0 || $threshold > 255) throw new \InvalidArgumentException('$threshold must be between 0 and ' . (2^32-1));
 
         $this->lowThreshold = $threshold;
 
@@ -202,7 +206,7 @@ class SetOptionsOp extends Operation
      */
     public function setMediumThreshold($threshold)
     {
-        if ($threshold < 0 || $threshold > (2^32-1)) throw new \InvalidArgumentException('$threshold must be between 0 and ' . (2^32-1));
+        if ($threshold < 0 || $threshold > 255) throw new \InvalidArgumentException('$threshold must be between 0 and ' . (2^32-1));
 
         $this->mediumThreshold = $threshold;
 
@@ -215,7 +219,7 @@ class SetOptionsOp extends Operation
      */
     public function setHighThreshold($threshold)
     {
-        if ($threshold < 0 || $threshold > (2^32-1)) throw new \InvalidArgumentException('$threshold must be between 0 and ' . (2^32-1));
+        if ($threshold < 0 || $threshold > 255) throw new \InvalidArgumentException('$threshold must be between 0 and ' . (2^32-1));
 
         $this->highThreshold = $threshold;
 
@@ -233,5 +237,77 @@ class SetOptionsOp extends Operation
         $this->homeDomain = $domain;
 
         return $this;
+    }
+
+    /**
+     * @return AccountId
+     */
+    public function getInflationDestinationAccount()
+    {
+        return $this->inflationDestinationAccount;
+    }
+
+    /**
+     * @return int
+     */
+    public function getClearFlags()
+    {
+        return $this->clearFlags;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSetFlags()
+    {
+        return $this->setFlags;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMasterWeight()
+    {
+        return $this->masterWeight;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLowThreshold()
+    {
+        return $this->lowThreshold;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMediumThreshold()
+    {
+        return $this->mediumThreshold;
+    }
+
+    /**
+     * @return int
+     */
+    public function getHighThreshold()
+    {
+        return $this->highThreshold;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHomeDomain()
+    {
+        return $this->homeDomain;
+    }
+
+    /**
+     * @return Signer
+     */
+    public function getSigner()
+    {
+        return $this->signer;
     }
 }
