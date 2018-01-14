@@ -317,7 +317,7 @@ class TransactionBuilder implements XdrEncodableInterface
      * @param null $sourceAccountId
      * @return TransactionBuilder
      */
-    public function setAccountData($key, $value, $sourceAccountId = null)
+    public function setAccountData($key, $value = null, $sourceAccountId = null)
     {
         return $this->addOperation(new ManageDataOp($key, $value, $sourceAccountId));
     }
