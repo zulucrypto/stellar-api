@@ -8,7 +8,7 @@ use ZuluCrypto\StellarSdk\Test\Util\HardwareWalletIntegrationTest;
 use phpseclib\Math\BigInteger;
 use ZuluCrypto\StellarSdk\Keypair;
 
-class MergeAccountOpTest extends HardwareWalletIntegrationTest
+class AccountMergeOpTest extends HardwareWalletIntegrationTest
 {
     /**
      * @group requires-hardwarewallet
