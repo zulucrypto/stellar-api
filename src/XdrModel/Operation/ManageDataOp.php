@@ -28,11 +28,8 @@ class ManageDataOp extends Operation
     {
         parent::__construct(Operation::TYPE_MANAGE_DATA, $sourceAccountId);
 
-        if (strlen($key) > 64) throw new \InvalidArgumentException('$key cannot be greater than 64 characters long');
-        if (strlen($value) > 64) throw new \InvalidArgumentException('$key cannot be greater than 64 characters long');
-
-        $this->key = $key;
-        $this->value = $value;
+        $this->setKey($key);
+        $this->setValue($value);
     }
 
     /**
@@ -45,8 +42,14 @@ class ManageDataOp extends Operation
         // Key
         $bytes .= XdrEncoder::string($this->key, 64);
 
-        // Value
-        $bytes .= XdrEncoder::optionalString($this->value, 64);
+        // Value (an optional field)
+        if ($this->value) {
+            $bytes .= XdrEncoder::boolean(true);
+            $bytes .= XdrEncoder::opaqueVariable($this->value);
+        }
+        else {
+            $bytes .= XdrEncoder::boolean(false);
+        }
 
         return $bytes;
     }
@@ -64,6 +67,8 @@ class ManageDataOp extends Operation
      */
     public function setKey($key)
     {
+        if (strlen($key) > 64) throw new \InvalidArgumentException('key cannot be longer than 64 characters');
+
         $this->key = $key;
     }
 
@@ -78,8 +83,10 @@ class ManageDataOp extends Operation
     /**
      * @param string $value
      */
-    public function setValue($value)
+    public function setValue($value = null)
     {
+        if (strlen($value) > 64) throw new \InvalidArgumentException('value cannot be longer than 64 characters');
+
         $this->value = $value;
     }
 }
