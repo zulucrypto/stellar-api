@@ -25,7 +25,7 @@ use ZuluCrypto\StellarSdk\Signing\TrezorSigner;
  * Run a specific test via:
  *  $ tests/run-hardware-wallet.sh --filter testCustomAsset12Payment
  */
-class HardwareWalletIntegrationTest extends IntegrationTest
+abstract class HardwareWalletIntegrationTest extends IntegrationTest
 {
     /**
      * @var string
