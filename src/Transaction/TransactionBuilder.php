@@ -340,8 +340,10 @@ class TransactionBuilder implements XdrEncodableInterface
         $bytes = '';
 
         // todo: $sequenceNumber should always be a BigInteger
-        $sequenceNumber = $this->sequenceNumber->toString();
-        if (!$sequenceNumber) {
+        if ($this->sequenceNumber) {
+            $sequenceNumber = $this->sequenceNumber->toString();
+        }
+        else {
             $sequenceNumber = $this->generateSequenceNumber();
         }
 
