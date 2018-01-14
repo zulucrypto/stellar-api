@@ -1,3 +1,8 @@
+### 0.2.2
+
+ * `Keypair` objects can now be created from public keys (a secret key is no longer required). See `Keypair::newFromPublicKey`
+ * Fix to `ManageDataOp` XDR encoding
+ 
 ### 0.2.1
 
  * Fixed an issue where the private key was used instead of the public key when building signer XDR
