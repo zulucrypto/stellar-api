@@ -36,7 +36,7 @@ class Payment extends Operation
      */
     public static function fromRawResponseData($rawData)
     {
-        if (!$rawData['type'] != Operation::TYPE_PAYMENT) throw new \InvalidArgumentException(sprintf('Attempted to create a Payment from invalid type %s', $rawData['type']));
+        if ($rawData['type'] != Operation::TYPE_PAYMENT) throw new \InvalidArgumentException(sprintf('Attempted to create a Payment from invalid type %s', $rawData['type']));
 
         $object = new Payment($rawData['id']);
 

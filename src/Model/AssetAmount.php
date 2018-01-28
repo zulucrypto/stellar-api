@@ -73,7 +73,7 @@ class AssetAmount
 
     public function __toString()
     {
-        return sprintf("%s %s", $this->getBalanceString(), $this->getAssetCode());
+        return sprintf("%s %s", strval($this->getBalance()), $this->getAssetCode());
     }
 
     /**
