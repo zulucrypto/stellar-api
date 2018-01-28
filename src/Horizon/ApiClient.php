@@ -136,10 +136,19 @@ class ApiClient
     {
         $transactionEnvelope = $transactionBuilder->sign($signingAccountSeedString);
 
+        return $this->submitTransaction(base64_encode($transactionEnvelope->toXdr()));
+    }
+
+    /**
+     * @param $base64TransactionEnvelope
+     * @return HorizonResponse
+     */
+    public function submitB64Transaction($base64TransactionEnvelope)
+    {
         return $this->post(
             sprintf('/transactions'),
             [
-                'tx' => base64_encode($transactionEnvelope->toXdr()),
+                'tx' => $base64TransactionEnvelope,
             ]
         );
     }

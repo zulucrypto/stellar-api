@@ -166,6 +166,19 @@ class Server
     }
 
     /**
+     * Submits a base64-encoded transaction to the Stellar network.
+     *
+     * No additional validation is performed on this transaction
+     *
+     * @param $base64TransactionEnvelope
+     * @return Horizon\Api\HorizonResponse
+     */
+    public function submitB64Transaction($base64TransactionEnvelope)
+    {
+        return $this->apiClient->submitB64Transaction($base64TransactionEnvelope);
+    }
+
+    /**
      * @return string
      */
     public function getHorizonBaseUrl()
