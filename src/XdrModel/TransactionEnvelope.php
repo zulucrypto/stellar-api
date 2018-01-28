@@ -58,16 +58,24 @@ class TransactionEnvelope implements XdrEncodableInterface
         return $this->transactionBuilder->hash();
     }
 
-    public function sign($secretKeyStrings)
+    /**
+     * Adds signatures using the given keypairs or secret key strings
+     *
+     * @param Keypair[]|string[] $keypairsOrsecretKeyStrings
+     * @return $this
+     */
+    public function sign($keypairsOrsecretKeyStrings)
     {
-        if (!is_array($secretKeyStrings)) $secretKeyStrings = [$secretKeyStrings];
+        if (!is_array($keypairsOrsecretKeyStrings)) $keypairsOrsecretKeyStrings = [$keypairsOrsecretKeyStrings];
 
-        foreach ($secretKeyStrings as $secretKeyString) {
+        foreach ($keypairsOrsecretKeyStrings as $keypairOrSecretKeyString) {
             $transactionHash = $this->transactionBuilder->hash();
 
-            $keypair = Keypair::newFromSeed($secretKeyString);
+            if (is_string($keypairOrSecretKeyString)) {
+                $keypairOrSecretKeyString = Keypair::newFromSeed($keypairOrSecretKeyString);
+            }
 
-            $decorated = $keypair->signDecorated($transactionHash);
+            $decorated = $keypairOrSecretKeyString->signDecorated($transactionHash);
             $this->signatures->append($decorated);
         }
 
