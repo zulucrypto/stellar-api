@@ -214,40 +214,14 @@ class Account extends RestApiModel
     }
 
     /**
-     * Streams Payment objects to $callback
-     *
-     * $callback should have arguments:
-     *  Payment
-     *
-     * For example:
-     *
-            $account->streamPayments(null, function(Payment $payment) {
-                printf('[%s] Amount: %s From %s' . PHP_EOL,
-                    $payment->getType(),
-                    $payment->getAmount(),
-                    $payment->getSourceAccountId()
-                );
-            });
+     * See ApiClient::streamPayments
      *
      * @param null $sinceCursor
      * @param callable $callback
      */
     public function streamPayments($sinceCursor = 'now', callable $callback = null)
     {
-        $url = sprintf('/accounts/%s/payments', $this->accountId);
-        $params = [];
-
-        if ($sinceCursor) $params['cursor'] = $sinceCursor;
-
-        if ($params) {
-            $url .= '?' . http_build_query($params);
-        }
-
-        $this->apiClient->getAndStream($url, function($rawData) use ($callback) {
-            $payment = Payment::fromRawResponseData($rawData);
-
-            $callback($payment);
-        });
+        $this->apiClient->streamPayments($sinceCursor, $callback);
     }
 
     /**
