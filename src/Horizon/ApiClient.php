@@ -10,6 +10,7 @@ use GuzzleHttp\Exception\ServerException;
 use ZuluCrypto\StellarSdk\Horizon\Api\HorizonResponse;
 use ZuluCrypto\StellarSdk\Horizon\Exception\HorizonException;
 use ZuluCrypto\StellarSdk\Model\Account;
+use ZuluCrypto\StellarSdk\Model\CreateAccountOperation;
 use ZuluCrypto\StellarSdk\Model\Effect;
 use ZuluCrypto\StellarSdk\Model\Ledger;
 use ZuluCrypto\StellarSdk\Model\Operation;
@@ -220,7 +221,7 @@ class ApiClient
      * For example:
 
         $client = ApiClient::newPublicClient();
-        $client->streamEffects(null, function(Effect $effect) {
+        $client->streamEffects('now', function(Effect $effect) {
             printf('Effect type: %s' . PHP_EOL, $effect->getType());
         });
      *
@@ -255,7 +256,7 @@ class ApiClient
      * For example:
 
         $client = ApiClient::newPublicClient();
-        $client->streamLedgers(null, function(Ledger $ledger) {
+        $client->streamLedgers('now', function(Ledger $ledger) {
             printf('[%s] Closed %s at %s with %s operations' . PHP_EOL,
                 (new \DateTime())->format('Y-m-d h:i:sa'),
                 $ledger->getId(),
@@ -295,7 +296,7 @@ class ApiClient
      * For example:
 
         $client = ApiClient::newPublicClient();
-        $client->streamOperations(null, function(Operation $operation) {
+        $client->streamOperations('now', function(Operation $operation) {
             printf('Effect type: %s' . PHP_EOL, $effect->getType());
         });
      *
@@ -322,7 +323,7 @@ class ApiClient
     }
 
     /**
-     * Streams Payment objects to $callback
+     * Streams Payment or CreateAccount objects to $callback
      *
      * $callback should have arguments:
      *  Payment
@@ -330,7 +331,7 @@ class ApiClient
      * For example:
 
         $client = ApiClient::newPublicClient();
-        $client->streamPayments(null, function(Payment $payment) {
+        $client->streamPayments('now', function(Payment $payment) {
             printf('Payment: from %s to %s' . PHP_EOL, $payment->getFromAccountId(), $payment->getToAccountId());
         });
      *
@@ -349,10 +350,13 @@ class ApiClient
         }
 
         $this->getAndStream($url, function($rawData) use ($callback) {
-            $parsedObject = Payment::fromRawResponseData($rawData);
-            $parsedObject->setApiClient($this);
+            // This endpoint returns payment operations and create account operations
+            if ($rawData['type'] == Operation::TYPE_PAYMENT) {
+                $parsedObject = Payment::fromRawResponseData($rawData);
+                $parsedObject->setApiClient($this);
 
-            $callback($parsedObject);
+                $callback($parsedObject);
+            }
         });
     }
 
@@ -365,7 +369,7 @@ class ApiClient
      * For example:
 
         $client = ApiClient::newPublicClient();
-        $client->streamTransactions(null, function(Transaction $transaction) {
+        $client->streamTransactions('now', function(Transaction $transaction) {
             printf('Transaction id %s' . PHP_EOL, $transaction->getId());
         });
      *
