@@ -24,6 +24,11 @@ class Payment extends Operation
      * @var string
      */
     private $toAccountId;
+    
+    /**
+     * @var string
+     */
+    private $transactionHash;
 
     /**
      * @var AssetAmount
@@ -84,6 +89,7 @@ class Payment extends Operation
 
         if (isset($rawData['from'])) $this->fromAccountId = $rawData['from'];
         if (isset($rawData['to'])) $this->toAccountId = $rawData['to'];
+        if (isset($rawData['transaction_hash'])) $this->transactionHash = $rawData['transaction_hash'];
 
         $assetAmount = null;
         // Native assets
@@ -178,5 +184,13 @@ class Payment extends Operation
     public function setAmount(AssetAmount $amount)
     {
         $this->amount = $amount;
+    }
+    
+    /**
+     * @return string
+     */
+    public function getTransactionHash()
+    {
+        return $this->transactionHash;
     }
 }
