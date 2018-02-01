@@ -137,7 +137,7 @@ class ApiClient
     {
         $transactionEnvelope = $transactionBuilder->sign($signingAccountSeedString);
 
-        return $this->submitTransaction(base64_encode($transactionEnvelope->toXdr()));
+        return $this->submitB64Transaction(base64_encode($transactionEnvelope->toXdr()));
     }
 
     /**
