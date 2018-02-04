@@ -5,8 +5,10 @@ namespace ZuluCrypto\StellarSdk\Transaction;
 
 use phpseclib\Math\BigInteger;
 use ZuluCrypto\StellarSdk\Horizon\ApiClient;
+use ZuluCrypto\StellarSdk\Horizon\Exception\HorizonException;
 use ZuluCrypto\StellarSdk\Keypair;
 use ZuluCrypto\StellarSdk\Model\StellarAmount;
+use ZuluCrypto\StellarSdk\Signing\PrivateKeySigner;
 use ZuluCrypto\StellarSdk\Signing\SigningInterface;
 use ZuluCrypto\StellarSdk\Util\MathSafety;
 use ZuluCrypto\StellarSdk\Xdr\Iface\XdrEncodableInterface;
@@ -23,6 +25,9 @@ use ZuluCrypto\StellarSdk\XdrModel\Operation\CreateAccountOp;
 use ZuluCrypto\StellarSdk\XdrModel\Operation\ManageDataOp;
 use ZuluCrypto\StellarSdk\XdrModel\Operation\Operation;
 use ZuluCrypto\StellarSdk\XdrModel\Operation\PaymentOp;
+use ZuluCrypto\StellarSdk\XdrModel\Operation\SetOptionsOp;
+use ZuluCrypto\StellarSdk\XdrModel\Signer;
+use ZuluCrypto\StellarSdk\XdrModel\SignerKey;
 use ZuluCrypto\StellarSdk\XdrModel\TimeBounds;
 use ZuluCrypto\StellarSdk\XdrModel\TransactionEnvelope;
 
@@ -142,6 +147,17 @@ class TransactionBuilder implements XdrEncodableInterface
     }
 
     /**
+     * @param Keypair $keypair
+     * @return DecoratedSignature
+     */
+    public function getSignatureForKeypair(Keypair $keypair)
+    {
+        $signer = new PrivateKeySigner($keypair);
+
+        return $this->signWith($signer);
+    }
+
+    /**
      * @return TransactionEnvelope
      */
     public function getTransactionEnvelope()
@@ -161,9 +177,17 @@ class TransactionBuilder implements XdrEncodableInterface
      */
     public function sign($secretKeyString = null)
     {
+        if ($secretKeyString instanceof Keypair) {
+            $secretKeyString = $secretKeyString->getSecret();
+        }
+
         // If $secretKeyString is null, check for a SigningProvider
         if (!$secretKeyString) {
-            if (!$this->signingProvider) throw new \ErrorException('$secretKeyString was empty and no signingProvider is set');
+            // No secret key and no signing provider: could be a pre-authorized
+            // transaction. Return empty envelope with no signatures
+            if (!$this->signingProvider) {
+                return new TransactionEnvelope($this);
+            }
 
             $this->signWith($this->signingProvider);
 
@@ -458,10 +482,14 @@ class TransactionBuilder implements XdrEncodableInterface
     {
         $this->ensureApiClient();
 
-        return $this->apiClient
-                ->getAccount($this->accountId->getAccountIdString())
-                ->getSequence() + 1
-        ;
+        try {
+            return $this->apiClient
+                    ->getAccount($this->accountId->getAccountIdString())
+                    ->getSequence() + 1
+                ;
+        } catch (HorizonException $e) {
+            throw new \ErrorException(sprintf('Could not get sequence number for %s, does this account exist?', $this->accountId->getAccountIdString()));
+        }
     }
 
     protected function ensureApiClient()
