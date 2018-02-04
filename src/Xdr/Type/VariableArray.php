@@ -40,4 +40,13 @@ class VariableArray implements XdrEncodableInterface
 
         return $bytes;
     }
+
+    /**
+     * @return int
+     */
+    public function count()
+    {
+        return count($this->elements);
+    }
+
 }
