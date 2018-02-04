@@ -52,7 +52,12 @@ class Account extends RestApiModel
         $object->sequence = $rawData['sequence'];
         $object->subentryCount = $rawData['subentry_count'];
         $object->thresholds = $rawData['thresholds'];
-        $object->data = $rawData['data'];
+        $object->data = [];
+        if (isset($rawData['data'])) {
+            foreach ($rawData['data'] as $key => $value) {
+                $object->data[$key] = base64_decode($value);
+            }
+        }
 
         if (isset($rawData['balances'])) {
             foreach ($rawData['balances'] as $rawBalance) {
@@ -326,5 +331,17 @@ class Account extends RestApiModel
     public function getBalances()
     {
         return $this->balances;
+    }
+
+    /**
+     * Returns an array of key => value pairs
+     *
+     * Note that the values have been base64-decoded and may be binary data
+     *
+     * @return array
+     */
+    public function getData()
+    {
+        return $this->data;
     }
 }
