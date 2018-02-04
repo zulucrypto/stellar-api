@@ -1,3 +1,19 @@
+### 0.3.0
+
+**Breaking Changes / Incompatibilities**
+ * Removed previously deprecated `CreateAccountXdrOperation`
+
+New Features / Fixes:
+ * "Create Account" operations are no longer included when streaming payments.
+ Previously, they would cause a crash since they could not be decoded to `Payment`
+ objects.
+ * Fixes and clarifications on several of the "getting started" examples
+ * `Account::getData` has been improved to base64-decode the account data automatically
+ * Added `Payment::getTransactionHash()` (contributed by @cballou)
+ * Several improvements to signature handling so that pre-authorized transactions can be submitted
+ * Fixed an issue encoding variable length opaque structures
+ * Fees are now calculated correctly for transactions with multiple operations
+
 ### 0.2.2
 
  * `Keypair` objects can now be created from public keys (a secret key is no longer required). See `Keypair::newFromPublicKey`
