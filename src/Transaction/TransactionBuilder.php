@@ -223,8 +223,8 @@ class TransactionBuilder implements XdrEncodableInterface
 
     public function getFee()
     {
-        // todo: calculate real fee
-        return 100;
+        // todo: load base fee from network
+        return 100 * $this->operations->count();
     }
 
     /**
