@@ -42,6 +42,12 @@ class AccountId implements XdrEncodableInterface
     private $accountIdBytes;
 
     /**
+     * Always 0
+     * @var int
+     */
+    private $keyType = 0;
+
+    /**
      * @param string|Keypair $accountIdString
      */
     public function __construct($accountIdString)
@@ -52,6 +58,8 @@ class AccountId implements XdrEncodableInterface
 
         $this->accountIdString = $accountIdString;
         $this->accountIdBytes = AddressableKey::getRawBytesFromBase32AccountId($accountIdString);
+
+        $this->keyType = 0;
     }
 
     /**
@@ -66,9 +74,17 @@ class AccountId implements XdrEncodableInterface
     {
         $bytes = "";
 
-        $bytes .= XdrEncoder::signedInteger(self::KEY_TYPE_ED25519);
+        $bytes .= XdrEncoder::unsignedInteger(self::KEY_TYPE_ED25519);
         $bytes .= XdrEncoder::opaqueFixed($this->accountIdBytes);
 
         return $bytes;
+    }
+
+    /**
+     * @return int
+     */
+    public function getKeyType()
+    {
+        return $this->keyType;
     }
 }
