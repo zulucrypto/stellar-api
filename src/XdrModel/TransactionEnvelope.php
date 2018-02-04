@@ -47,6 +47,14 @@ class TransactionEnvelope implements XdrEncodableInterface
     }
 
     /**
+     * @return string
+     */
+    public function toBase64()
+    {
+        return base64_encode($this->toXdr());
+    }
+
+    /**
      * Returns the hash of the transaction envelope
      *
      * This hash is what is signed
@@ -82,9 +90,10 @@ class TransactionEnvelope implements XdrEncodableInterface
         return $this;
     }
 
-    public function addSignature($signatureBytes, $hint = null)
+
+    public function addRawSignature($signatureBytes, Keypair $keypair)
     {
-        $decorated = new DecoratedSignature($hint, $signatureBytes);
+        $decorated = new DecoratedSignature($keypair->getHint(), $signatureBytes);
 
         $this->signatures->append($decorated);
     }
