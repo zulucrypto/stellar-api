@@ -60,7 +60,7 @@ class XdrEncoder
         $bytes = '';
         
         $bytes .= self::unsignedInteger(strlen($value));
-        $bytes .= $value;
+        $bytes .= self::applyPadding($value);
 
         return $bytes;
     }
