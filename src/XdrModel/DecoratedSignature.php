@@ -50,4 +50,16 @@ class DecoratedSignature implements XdrEncodableInterface
     {
         return base64_encode($this->signature);
     }
+
+    /**
+     * Returns the raw 64 bytes representing the signature
+     *
+     * This does not include the hint
+     *
+     * @return string
+     */
+    public function getRawSignature()
+    {
+        return $this->signature;
+    }
 }
