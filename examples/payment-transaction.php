@@ -9,7 +9,7 @@ require '../vendor/autoload.php';
 use \ZuluCrypto\StellarSdk\Keypair;
 use \ZuluCrypto\StellarSdk\Server;
 
-$server = Server::customNet('http://localhost:4080', 'Integration Test Network ; zulucrypto');
+$server = Server::testNet();
 
 // GAJCCCRIRXAYEU2ATNQAFYH4E2HKLN2LCKM2VPXCTJKIBVTRSOLEGCJZ
 $sourceKeypair = Keypair::newFromSeed('SDJCZISO5M5XAUV6Y7MZJNN3JZ5BWPXDHV4GXP3MYNACVDNQRQSERXBC');

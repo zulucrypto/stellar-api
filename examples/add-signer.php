@@ -14,7 +14,7 @@ use \ZuluCrypto\StellarSdk\XdrModel\SignerKey;
 use \ZuluCrypto\StellarSdk\XdrModel\Signer;
 
 
-$server = Server::customNet('http://localhost:4080/', 'Integration Test Network ; zulucrypto');
+$server = Server::testNet();
 
 // GB7H6NXC42ABH7C4IBQSYXKAFNAC4V4ZDNRXBVH6MKLIRB6YLXC7RWYD
 $currentAccount = Keypair::newFromSeed('SD2MKS6CGVTFH7NJZFXQGXDQSDOLRLCRY7JN6WPULMJPCGBNLK4KU34R');
