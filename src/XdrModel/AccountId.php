@@ -5,6 +5,8 @@ namespace ZuluCrypto\StellarSdk\XdrModel;
 use ZuluCrypto\StellarSdk\AddressableKey;
 use ZuluCrypto\StellarSdk\Keypair;
 use ZuluCrypto\StellarSdk\Xdr\Iface\XdrEncodableInterface;
+use ZuluCrypto\StellarSdk\Xdr\XdrBuffer;
+use ZuluCrypto\StellarSdk\Xdr\XdrDecoder;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 
 /**
@@ -78,6 +80,24 @@ class AccountId implements XdrEncodableInterface
         $bytes .= XdrEncoder::opaqueFixed($this->accountIdBytes);
 
         return $bytes;
+    }
+
+    /**
+     * @param XdrBuffer $xdr
+     * @return AccountId
+     * @throws \ErrorException
+     */
+    public static function fromXdr(XdrBuffer $xdr)
+    {
+        $keyType = $xdr->readUnsignedInteger();
+        $accountIdBytes = $xdr->readOpaqueFixed(32);
+        $accountIdString = AddressableKey::addressFromRawBytes($accountIdBytes);
+
+        $model = new AccountId($accountIdString);
+
+        $model->keyType = $keyType;
+
+        return $model;
     }
 
     /**
