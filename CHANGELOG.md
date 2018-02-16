@@ -1,3 +1,23 @@
+### 0.4.0
+
+**Breaking Changes / Incompatibilities**
+ * Refactored `getPayments` and `streamPayments` to return a new `AssetTransferInterface` instead of a `Payment` object. See details below.
+
+This release is to refactor how payments are handled. The Horizon `/accounts/<account ID>/payments` endpoint
+returns a variety of operations, all of which represent XLM or another asset being transferred:
+
+ * Payment
+ * Path payment
+ * Create account
+ * Merge account
+ 
+Methods that previously returned a `Payment` will now return `AssetTransferInterface`
+
+To migrate your code:
+
+1. Replace any calls to `$payment->getType()` with `$payment->getAssetTransferType()`. This will return a string describing the operation type
+2. Replace `$payment->getAmount()` with `$payment->getAssetAmount()`
+
 ### 0.3.0
 
 **Breaking Changes / Incompatibilities**
