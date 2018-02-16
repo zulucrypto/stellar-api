@@ -5,6 +5,7 @@ namespace ZuluCrypto\StellarSdk\XdrModel;
 
 use ZuluCrypto\StellarSdk\AddressableKey;
 use ZuluCrypto\StellarSdk\Util\MathSafety;
+use ZuluCrypto\StellarSdk\Xdr\XdrBuffer;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 
 /**
@@ -71,5 +72,38 @@ class TimeBounds
         $bytes .= XdrEncoder::unsignedInteger64($this->maxTime);
 
         return $bytes;
+    }
+
+    /**
+     * @param XdrBuffer $xdr
+     * @return null|TimeBounds
+     * @throws \ErrorException
+     */
+    public static function fromXdr(XdrBuffer $xdr)
+    {
+        // This is an optional field, so return null if the boolean value is 0
+        if (!$xdr->readBoolean()) return null;
+
+        $model = new TimeBounds();
+        $model->minTime = $xdr->readUnsignedInteger64();
+        $model->maxTime = $xdr->readUnsignedInteger64();
+
+        return $model;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMinTimestamp()
+    {
+        return $this->minTime;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxTimestamp()
+    {
+        return $this->maxTime;
     }
 }
