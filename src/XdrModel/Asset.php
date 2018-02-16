@@ -5,6 +5,7 @@ namespace ZuluCrypto\StellarSdk\XdrModel;
 
 
 use ZuluCrypto\StellarSdk\Xdr\Iface\XdrEncodableInterface;
+use ZuluCrypto\StellarSdk\Xdr\XdrBuffer;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 
 /**
@@ -97,6 +98,29 @@ class Asset implements XdrEncodableInterface
         }
 
         return $bytes;
+    }
+
+    /**
+     * @param XdrBuffer $xdr
+     * @return Asset
+     * @throws \ErrorException
+     */
+    public static function fromXdr(XdrBuffer $xdr)
+    {
+        $type = $xdr->readUnsignedInteger();
+
+        $model = new Asset($type);
+
+        if ($type == static::TYPE_ALPHANUM_4) {
+            $model->assetCode = $xdr->readOpaqueFixedString(4);
+            $model->issuer = AccountId::fromXdr($xdr);
+        }
+        if ($type == static::TYPE_ALPHANUM_12) {
+            $model->assetCode = $xdr->readOpaqueFixedString(12);
+            $model->issuer = AccountId::fromXdr($xdr);
+        }
+
+        return $model;
     }
 
     /**
