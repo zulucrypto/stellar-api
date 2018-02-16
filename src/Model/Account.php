@@ -189,7 +189,7 @@ class Account extends RestApiModel
     /**
      * @param null $sinceCursor
      * @param int  $limit
-     * @return array|Payment[]
+     * @return array|AssetTransferInterface[]|RestApiModel[]
      */
     public function getPayments($sinceCursor = null, $limit = 50)
     {
@@ -209,7 +209,21 @@ class Account extends RestApiModel
         $rawRecords = $response->getRecords($limit);
 
         foreach ($rawRecords as $rawRecord) {
-            $result = Payment::fromRawResponseData($rawRecord);
+            switch ($rawRecord['type']) {
+                case 'create_account':
+                    $result = CreateAccountOperation::fromRawResponseData($rawRecord);
+                    break;
+                case 'payment':
+                    $result = Payment::fromRawResponseData($rawRecord);
+                    break;
+                case 'account_merge':
+                    $result = AccountMergeOperation::fromRawResponseData($rawRecord);
+                    break;
+                case 'path_payment':
+                    $result = PathPayment::fromRawResponseData($rawRecord);
+                    break;
+            }
+
             $result->setApiClient($this->getApiClient());
 
             $results[] = $result;
