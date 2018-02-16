@@ -10,10 +10,12 @@ use GuzzleHttp\Exception\ServerException;
 use ZuluCrypto\StellarSdk\Horizon\Api\HorizonResponse;
 use ZuluCrypto\StellarSdk\Horizon\Exception\HorizonException;
 use ZuluCrypto\StellarSdk\Model\Account;
+use ZuluCrypto\StellarSdk\Model\AccountMergeOperation;
 use ZuluCrypto\StellarSdk\Model\CreateAccountOperation;
 use ZuluCrypto\StellarSdk\Model\Effect;
 use ZuluCrypto\StellarSdk\Model\Ledger;
 use ZuluCrypto\StellarSdk\Model\Operation;
+use ZuluCrypto\StellarSdk\Model\PathPayment;
 use ZuluCrypto\StellarSdk\Model\Payment;
 use ZuluCrypto\StellarSdk\Model\Transaction;
 use ZuluCrypto\StellarSdk\Transaction\TransactionBuilder;
@@ -326,12 +328,12 @@ class ApiClient
      * Streams Payment or CreateAccount objects to $callback
      *
      * $callback should have arguments:
-     *  Payment
+     *  AssetTransferInterface
      *
      * For example:
 
         $client = ApiClient::newPublicClient();
-        $client->streamPayments('now', function(Payment $payment) {
+        $client->streamPayments('now', function(AssetTransferInterface $payment) {
             printf('Payment: from %s to %s' . PHP_EOL, $payment->getFromAccountId(), $payment->getToAccountId());
         });
      *
@@ -350,13 +352,24 @@ class ApiClient
         }
 
         $this->getAndStream($url, function($rawData) use ($callback) {
-            // This endpoint returns payment operations and create account operations
-            if ($rawData['type'] == Operation::TYPE_PAYMENT) {
-                $parsedObject = Payment::fromRawResponseData($rawData);
-                $parsedObject->setApiClient($this);
-
-                $callback($parsedObject);
+            switch ($rawData['type']) {
+                case 'create_account':
+                    $parsedObject = CreateAccountOperation::fromRawResponseData($rawData);
+                    break;
+                case 'payment':
+                    $parsedObject = Payment::fromRawResponseData($rawData);
+                    break;
+                case 'account_merge':
+                    $parsedObject = AccountMergeOperation::fromRawResponseData($rawData);
+                    break;
+                case 'path_payment':
+                    $parsedObject = PathPayment::fromRawResponseData($rawData);
+                    break;
             }
+
+            $parsedObject->setApiClient($this);
+
+            $callback($parsedObject);
         });
     }
 
