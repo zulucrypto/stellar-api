@@ -20,7 +20,7 @@ use ZuluCrypto\StellarSdk\XdrModel\Operation\ManageOfferOp;
 use ZuluCrypto\StellarSdk\XdrModel\Price;
 
 
-$horizonBaseUrl = getenv('HORIZON_BASE_URL');
+$horizonBaseUrl = getenv('STELLAR_HORIZON_BASE_URL');
 if (!$horizonBaseUrl) $horizonBaseUrl = 'http://localhost:8000/';
 
 $networkPassphrase = getenv('STELLAR_NETWORK_PASSPHRASE');
