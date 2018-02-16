@@ -4,7 +4,7 @@
 namespace ZuluCrypto\StellarSdk\Model;
 
 
-class PathPayment extends Operation
+class PathPayment extends Operation implements AssetTransferInterface
 {
     /**
      * @var string
@@ -78,6 +78,15 @@ class PathPayment extends Operation
         $this->sourceMax = $sourceAssetMax;
     }
 
+    public function getAssetTransferType()
+    {
+        return $this->type;
+    }
+
+    public function getAssetAmount()
+    {
+        return $this->destinationAsset;
+    }
     /**
      * @return string
      */

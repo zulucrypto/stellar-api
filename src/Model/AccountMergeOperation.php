@@ -7,7 +7,7 @@ namespace ZuluCrypto\StellarSdk\Model;
 /**
  * See: https://www.stellar.org/developers/horizon/reference/resources/operation.html#account-merge
  */
-class AccountMergeOperation extends Operation
+class AccountMergeOperation extends Operation implements AssetTransferInterface
 {
     /**
      * The account that will be removed
@@ -54,6 +54,26 @@ class AccountMergeOperation extends Operation
 
         $this->sourceAccountId = $rawData['account'];
         $this->mergeIntoAccountId = $rawData['into'];
+    }
+
+    public function getAssetTransferType()
+    {
+        return $this->type;
+    }
+
+    public function getFromAccountId()
+    {
+        return $this->sourceAccountId;
+    }
+
+    public function getToAccountId()
+    {
+        return $this->mergeIntoAccountId;
+    }
+
+    public function getAssetAmount()
+    {
+        return null;
     }
 
     /**

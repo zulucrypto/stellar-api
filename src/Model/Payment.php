@@ -7,7 +7,7 @@ namespace ZuluCrypto\StellarSdk\Model;
 /**
  * See: https://www.stellar.org/developers/horizon/reference/resources/operation.html#payment
  */
-class Payment extends Operation
+class Payment extends Operation implements AssetTransferInterface
 {
     /**
      *
@@ -104,6 +104,16 @@ class Payment extends Operation
         }
 
         $this->amount = $assetAmount;
+    }
+
+    public function getAssetTransferType()
+    {
+        return $this->type;
+    }
+
+    public function getAssetAmount()
+    {
+        return $this->amount;
     }
 
     /**

@@ -4,7 +4,7 @@
 namespace ZuluCrypto\StellarSdk\Model;
 
 
-class CreateAccountOperation extends Operation
+class CreateAccountOperation extends Operation implements AssetTransferInterface
 {
     /**
      * The new account ID that was funded
@@ -54,6 +54,26 @@ class CreateAccountOperation extends Operation
         $this->fundingAccountId = $rawData['funder'];
 
         $this->startingBalance = new AssetAmount($rawData['starting_balance']);
+    }
+
+    public function getAssetTransferType()
+    {
+        return $this->type;
+    }
+
+    public function getFromAccountId()
+    {
+        return $this->fundingAccountId;
+    }
+
+    public function getToAccountId()
+    {
+        return $this->newAccountId;
+    }
+
+    public function getAssetAmount()
+    {
+        return $this->startingBalance;
     }
 
     /**
