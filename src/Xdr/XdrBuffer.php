@@ -75,6 +75,21 @@ class XdrBuffer
     }
 
     /**
+     * @param $length
+     * @return string
+     * @throws \ErrorException
+     */
+    public function readOpaqueFixedString($length)
+    {
+        $this->assertBytesRemaining($length);
+
+        $data = XdrDecoder::opaqueFixedString(substr($this->xdrBytes, $this->position), $length);
+        $this->position += $length;
+
+        return $data;
+    }
+
+    /**
      * @return bool
      * @throws \ErrorException
      */

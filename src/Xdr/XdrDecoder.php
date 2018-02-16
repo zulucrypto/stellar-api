@@ -112,6 +112,21 @@ class XdrDecoder
     }
 
     /**
+     * Reads a fixed opaque value and returns it as a string
+     *
+     * @param $xdr
+     * @param $length
+     * @return string
+     */
+    public static function opaqueFixedString($xdr, $length)
+    {
+        $bytes = static::opaqueFixed($xdr, $length);
+
+        // remove trailing nulls
+        return strval(rtrim($bytes, "\0x00"));
+    }
+
+    /**
      * @param $xdr
      * @param $length
      * @return bool|string
