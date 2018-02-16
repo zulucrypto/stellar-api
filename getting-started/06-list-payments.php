@@ -19,9 +19,9 @@ while (true) {
         if ($payment->getPagingToken() == $currentCursor) break 2;
 
         printf('[%s] Amount: %s From %s' . PHP_EOL,
-            $payment->getType(),
-            $payment->getAmount(),
-            $payment->getSourceAccountId()
+            $payment->getAssetTransferType(),
+            $payment->getAssetAmount(),
+            $payment->getFromAccountId()
         );
 
         $currentCursor = $payment->getPagingToken();
