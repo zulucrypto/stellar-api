@@ -207,8 +207,16 @@ class ApiClient
             $apiResponse = $this->httpClient->post($relativeUrl, [ 'form_params' => $parameters ]);
         }
         catch (ClientException $e) {
-            print "Client error:\n";
-            print $e->getResponse()->getBody() . "\n";
+              // If the response can be json-decoded then it can be converted to a HorizonException
+            $decoded = null;
+            if ($e->getResponse()) {
+                $decoded = Json::mustDecode($e->getResponse()->getBody());
+                throw HorizonException::fromRawResponse($relativeUrl, 'POST', $decoded);
+            }
+            // No response, something else went wrong
+            else {
+                throw $e;
+            }
         }
 
         return new HorizonResponse($apiResponse->getBody());

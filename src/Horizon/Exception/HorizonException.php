@@ -65,6 +65,13 @@ class HorizonException extends \ErrorException
      * @var array
      */
     protected $raw;
+    
+    /**
+     * Result codes for Horizon operations errors.
+     *
+     * @var array
+     */
+    protected $resultCodes;
 
     /**
      * @param                 $requestedUrl
@@ -85,6 +92,9 @@ class HorizonException extends \ErrorException
         if (isset($raw['type'])) $exception->type = $raw['type'];
         if (isset($raw['status'])) $exception->httpStatusCode = $raw['status'];
         if (isset($raw['detail'])) $exception->detail = $raw['detail'];
+        if (!empty($raw['extras']['result_codes']['operations'])) {
+            $exception->resultCodes = $raw['extras']['result_codes']['operations'];
+        }
 
         // Message can contain better info after we've filled out more fields
         $exception->message = $exception->buildMessage();
@@ -111,12 +121,13 @@ class HorizonException extends \ErrorException
         // Additional data used to help the user resolve the error
         $hint = '';
 
-        $message = sprintf('[%s] %s: %s (Requested URL: %s %s)',
+        $message = sprintf('[%s] %s: %s (Requested URL: %s %s) Result Codes : %s',
             $this->httpStatusCode,
             $this->title,
             $this->detail,
             $this->httpMethod,
-            $this->requestedUrl
+            $this->requestedUrl,
+            print_r($this->resultCodes,true)
         );
 
         // Rate limit exceeded
@@ -237,5 +248,25 @@ class HorizonException extends \ErrorException
     public function setClientException($clientException)
     {
         $this->clientException = $clientException;
+    }
+    
+     /**
+     * Get the result codes from Horizon Response.
+     * 
+     * @return array
+     */
+    function getResultCodes()
+    {
+        return $this->resultCodes;
+    }
+    
+    /**
+     * Set the result codes from Horizon Response.
+     * 
+     * @param array $resultCodes
+     */
+    function setResultCodes($resultCodes)
+    {
+        $this->resultCodes = $resultCodes;
     }
 }
