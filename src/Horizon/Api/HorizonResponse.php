@@ -11,7 +11,7 @@ class HorizonResponse
      *
      * @var array
      */
-    private $rawData;
+    protected $rawData;
 
     public function __construct($jsonEncodedData)
     {

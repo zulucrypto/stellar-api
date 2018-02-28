@@ -8,6 +8,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use ZuluCrypto\StellarSdk\Horizon\Api\HorizonResponse;
+use ZuluCrypto\StellarSdk\Horizon\Api\PostTransactionResponse;
 use ZuluCrypto\StellarSdk\Horizon\Exception\HorizonException;
 use ZuluCrypto\StellarSdk\Model\Account;
 use ZuluCrypto\StellarSdk\Model\AccountMergeOperation;
@@ -133,7 +134,7 @@ class ApiClient
      *
      * @param TransactionBuilder $transactionBuilder
      * @param                    $signingAccountSeedString
-     * @return HorizonResponse
+     * @return PostTransactionResponse
      */
     public function submitTransaction(TransactionBuilder $transactionBuilder, $signingAccountSeedString)
     {
@@ -144,16 +145,18 @@ class ApiClient
 
     /**
      * @param $base64TransactionEnvelope
-     * @return HorizonResponse
+     * @return PostTransactionResponse
      */
     public function submitB64Transaction($base64TransactionEnvelope)
     {
-        return $this->post(
+        $apiResponse = $this->post(
             sprintf('/transactions'),
             [
                 'tx' => $base64TransactionEnvelope,
             ]
         );
+
+        return PostTransactionResponse::fromApiResponse($apiResponse);
     }
 
     /**

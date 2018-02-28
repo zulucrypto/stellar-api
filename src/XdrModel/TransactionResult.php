@@ -61,6 +61,12 @@ class TransactionResult
         $rawCode = $xdr->readInteger();
         $model->resultCode = $rawCode;
 
+        $numOperations = $xdr->readInteger();
+        for ($i=0; $i < $numOperations; $i++) {
+            $op = OperationResult::fromXdr($xdr);
+            $model->operationResults[] = $op;
+        }
+
         return $model;
     }
 
@@ -100,5 +106,13 @@ class TransactionResult
     public function getFee()
     {
         return $this->feeCharged->getScaledValue();
+    }
+
+    /**
+     * @return OperationResult[]
+     */
+    public function getOperationResults()
+    {
+        return $this->operationResults;
     }
 }
