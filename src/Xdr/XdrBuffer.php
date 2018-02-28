@@ -60,6 +60,36 @@ class XdrBuffer
     }
 
     /**
+     * @return int
+     * @throws \ErrorException
+     */
+    public function readInteger()
+    {
+        $dataSize = 4;
+        $this->assertBytesRemaining($dataSize);
+
+        $data = XdrDecoder::signedInteger(substr($this->xdrBytes, $this->position, $dataSize));
+        $this->position += $dataSize;
+
+        return $data;
+    }
+
+    /**
+     * @return int
+     * @throws \ErrorException
+     */
+    public function readInteger64()
+    {
+        $dataSize = 8;
+        $this->assertBytesRemaining($dataSize);
+
+        $data = XdrDecoder::signedInteger64(substr($this->xdrBytes, $this->position, $dataSize));
+        $this->position += $dataSize;
+
+        return $data;
+    }
+
+    /**
      * @param $length
      * @return bool|string
      * @throws \ErrorException
