@@ -54,6 +54,9 @@ class OperationResult
             case Operation::TYPE_PATH_PAYMENT;
                 return PathPaymentResult::fromXdr($xdr);
                 break;
+            case Operation::TYPE_MANAGE_OFFER:
+                return ManageOfferResult::fromXdr($xdr);
+                break;
             default:
                 throw new \ErrorException(sprintf('Unknown operation type: %s', $opType));
         }

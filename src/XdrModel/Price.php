@@ -5,6 +5,7 @@ namespace ZuluCrypto\StellarSdk\XdrModel;
 
 
 use ZuluCrypto\StellarSdk\Xdr\Iface\XdrEncodableInterface;
+use ZuluCrypto\StellarSdk\Xdr\XdrBuffer;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 
 /**
@@ -43,6 +44,27 @@ class Price implements XdrEncodableInterface
         $bytes .= XdrEncoder::unsignedInteger($this->denominator);
 
         return $bytes;
+    }
+
+    /**
+     * @param XdrBuffer $xdr
+     * @return Price
+     * @throws \ErrorException
+     */
+    public static function fromXdr(XdrBuffer $xdr)
+    {
+        $numerator = $xdr->readUnsignedInteger();
+        $denominator = $xdr->readUnsignedInteger();
+
+        return new Price($numerator, $denominator);
+    }
+
+    /**
+     * @return float
+     */
+    public function toFloat()
+    {
+        return floatval($this->numerator / $this->denominator);
     }
 
     /**

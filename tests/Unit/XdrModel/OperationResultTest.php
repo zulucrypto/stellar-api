@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use ZuluCrypto\StellarSdk\Xdr\XdrBuffer;
 use ZuluCrypto\StellarSdk\XdrModel\Asset;
 use ZuluCrypto\StellarSdk\XdrModel\CreateAccountResult;
+use ZuluCrypto\StellarSdk\XdrModel\ManageOfferResult;
 use ZuluCrypto\StellarSdk\XdrModel\OperationResult;
 use ZuluCrypto\StellarSdk\XdrModel\PathPaymentResult;
 use ZuluCrypto\StellarSdk\XdrModel\PaymentResult;
@@ -68,5 +69,60 @@ class OperationResultTest extends TestCase
 
         $this->assertEquals(Asset::TYPE_NATIVE, $offer->getAssetBought()->getType());
         $this->assertEquals(120, $offer->getAmountBought()->getScaledValue());
+    }
+
+    public function testManageOfferOperationResultCreate()
+    {
+        $xdr = new XdrBuffer(base64_decode('AAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAZu10Z8p5vPaI2kYKQYdT9yrRS1hk1v5lj9ltvEt8rbkAAAAAAAAACAAAAAJVU0RURVNUAAAAAAAAAAAA0/c9zJnJQpAz9WkfgbePguOqP+8FnamSQyAubOcJB1EAAAAAAAAAAACYloAAAAACAAAAAQAAAAAAAAAAAAAAAA=='));
+
+        /** @var ManageOfferResult $result */
+        $result = OperationResult::fromXdr($xdr);
+
+        $this->assertTrue($result instanceof ManageOfferResult, 'Incorrect class returned');
+        $this->assertEquals(null, $result->getErrorCode());
+
+        // Should be 0 offers claimed since this is a "create"
+        $this->assertCount(0, $result->getClaimedOffers());
+        $this->assertNotEmpty($result->getOffer()->getOfferId());
+
+        $this->assertEquals('GBTO25DHZJ43Z5UI3JDAUQMHKP3SVUKLLBSNN7TFR7MW3PCLPSW3SFQQ', $result->getOffer()->getSeller()->getAccountIdString());
+        $this->assertEquals('GDJ7OPOMTHEUFEBT6VUR7ANXR6BOHKR754CZ3KMSIMQC43HHBEDVDWVG', $result->getOffer()->getSellingAsset()->getIssuer()->getAccountIdString());
+
+        $this->assertEquals(Asset::TYPE_NATIVE, $result->getOffer()->getBuyingAsset()->getType());
+        $this->assertEquals(1, $result->getOffer()->getSellingAmount()->getScaledValue());
+        $this->assertEquals(2, $result->getOffer()->getPrice()->toFloat());
+    }
+
+    public function testManageOfferOperationResultUpdate()
+    {
+        $xdr = new XdrBuffer(base64_decode('AAAAAAAAAAMAAAAAAAAAAAAAAAEAAAAAZu10Z8p5vPaI2kYKQYdT9yrRS1hk1v5lj9ltvEt8rbkAAAAAAAAACAAAAAJVU0RURVNUAAAAAAAAAAAA0/c9zJnJQpAz9WkfgbePguOqP+8FnamSQyAubOcJB1EAAAAAAAAAAACYloAAAAADAAAAAQAAAAAAAAAAAAAAAA=='));
+
+        /** @var ManageOfferResult $result */
+        $result = OperationResult::fromXdr($xdr);
+
+        $this->assertTrue($result instanceof ManageOfferResult, 'Incorrect class returned');
+        $this->assertEquals(null, $result->getErrorCode());
+
+        // Should be 0 offers claimed since this is a "create"
+        $this->assertCount(0, $result->getClaimedOffers());
+        $this->assertEquals(8, $result->getOffer()->getOfferId());
+
+        $this->assertEquals('GBTO25DHZJ43Z5UI3JDAUQMHKP3SVUKLLBSNN7TFR7MW3PCLPSW3SFQQ', $result->getOffer()->getSeller()->getAccountIdString());
+        $this->assertEquals('GDJ7OPOMTHEUFEBT6VUR7ANXR6BOHKR754CZ3KMSIMQC43HHBEDVDWVG', $result->getOffer()->getSellingAsset()->getIssuer()->getAccountIdString());
+
+        $this->assertEquals(Asset::TYPE_NATIVE, $result->getOffer()->getBuyingAsset()->getType());
+        $this->assertEquals(1, $result->getOffer()->getSellingAmount()->getScaledValue());
+        $this->assertEquals(3, $result->getOffer()->getPrice()->toFloat());
+    }
+
+    public function testManageOfferOperationResultDelete()
+    {
+        $xdr = new XdrBuffer(base64_decode('AAAAAAAAAAMAAAAAAAAAAAAAAAIAAAAA'));
+
+        /** @var ManageOfferResult $result */
+        $result = OperationResult::fromXdr($xdr);
+
+        $this->assertTrue($result instanceof ManageOfferResult, 'Incorrect class returned');
+        $this->assertEquals(null, $result->getErrorCode());
     }
 }
