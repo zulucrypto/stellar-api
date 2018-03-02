@@ -18,6 +18,7 @@ use ZuluCrypto\StellarSdk\XdrModel\Asset;
 use ZuluCrypto\StellarSdk\Server;
 use ZuluCrypto\StellarSdk\XdrModel\Operation\ManageOfferOp;
 use ZuluCrypto\StellarSdk\XdrModel\Price;
+use ZuluCrypto\StellarSdk\XdrModel\Operation\SetOptionsOp;
 
 
 $horizonBaseUrl = getenv('STELLAR_HORIZON_BASE_URL');
@@ -39,6 +40,8 @@ $usdIssuingKeypair = setupKeypair('SBJXZEVYRX244HKDY6L5JZYPWDQW6D3WLEE3PTMQM4CSU
 $eurIssuingKeypair = setupKeypair('SAXU3ZUG3RGQLAQBBPDPHANM4UOO32D7IDLBA57JH3GXYQSJLKYHHMRM');
 // GC5DIPGB56HFCAUTX27K3TENHB65VQ2RNH2DJ3KALEXJHR6STPICMC3Y
 $jpyIssuingKeypair = setupKeypair('SDLK77FFXNCSTLXD6HMVGVR24FAK2GF6KX47I2FYOLRBCKPOD6TRW7V6');
+// GAOM2624VSUBOGXTKS6ZVZZRXYUQTFNMUOGTVW6O5UT6JSV4T6F457DA
+$authRequiredIssuingKeypair = setupKeypair('SABFYGWPSP3EEJ2EURHQYAIRTNK3SVQPED5PWOHGCWKPZBSCWBV4QGKE');
 
 // GBTO25DHZJ43Z5UI3JDAUQMHKP3SVUKLLBSNN7TFR7MW3PCLPSW3SFQQ
 $usdBankKeypair = setupKeypair('SDJOXTS4TE3Q3HUIFQK5AQCTRML6HIOUQIXDLCEQHICOFHU5CQN6DBLS');
@@ -61,7 +64,17 @@ $nativeAsset = Asset::newNativeAsset();
 $usdAsset = Asset::newCustomAsset('USDTEST', $usdIssuingKeypair->getPublicKey());
 $eurAsset = Asset::newCustomAsset('EURTEST', $eurIssuingKeypair->getPublicKey());
 $jpyAsset = Asset::newCustomAsset('JPYTEST', $jpyIssuingKeypair->getPublicKey());
+$authRequiredAsset = Asset::newCustomAsset('AUTHREQ', $authRequiredIssuingKeypair->getPublicKey());
 
+// Configure assets
+print "Configuring assets...\n";
+
+$op = new SetOptionsOp();
+$op->setAuthRevocable(true);
+$op->setAuthRequired(true);
+$server->buildTransaction($authRequiredIssuingKeypair)
+    ->addOperation($op)
+    ->submit($authRequiredIssuingKeypair);
 
 // Establish trustlines for banks to assets
 print "Establishing trustlines...\n";
@@ -81,6 +94,13 @@ $server->buildTransaction($jpyBankKeypair)
 $server->buildTransaction($userAliceKeypair)
     ->addChangeTrustOp($eurAsset)
     ->submit($userAliceKeypair);
+
+$server->buildTransaction($userAliceKeypair)
+    ->addChangeTrustOp($authRequiredAsset)
+    ->submit($userAliceKeypair);
+$server->buildTransaction($authRequiredIssuingKeypair)
+    ->authorizeTrustline($authRequiredAsset, $userAliceKeypair)
+    ->submit($authRequiredIssuingKeypair);
 
 $server->buildTransaction($userBobKeypair)
     ->addChangeTrustOp($eurAsset)
