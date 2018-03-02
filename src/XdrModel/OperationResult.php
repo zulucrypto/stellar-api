@@ -46,7 +46,7 @@ class OperationResult
         $opType = $xdr->readInteger();
         switch ($opType) {
             case Operation::TYPE_CREATE_ACCOUNT:
-                // todo
+                return CreateAccountResult::fromXdr($xdr);
                 break;
             case Operation::TYPE_PAYMENT:
                 return PaymentResult::fromXdr($xdr);
