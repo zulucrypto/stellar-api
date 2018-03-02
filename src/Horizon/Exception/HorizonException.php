@@ -69,9 +69,14 @@ class HorizonException extends \ErrorException
     /**
      * Result codes for Horizon operations errors.
      *
-     * @var array
+     * @var string[]
      */
-    protected $resultCodes;
+    protected $operationResultCodes;
+
+    /**
+     * @var string
+     */
+    protected $transactionResultCode;
 
     /**
      * NOTE: changes here may requires changes to PostTransactionException::fromHorizonException
@@ -95,7 +100,10 @@ class HorizonException extends \ErrorException
         if (isset($raw['status'])) $exception->httpStatusCode = $raw['status'];
         if (isset($raw['detail'])) $exception->detail = $raw['detail'];
         if (!empty($raw['extras']['result_codes']['operations'])) {
-            $exception->resultCodes = $raw['extras']['result_codes']['operations'];
+            $exception->operationResultCodes = $raw['extras']['result_codes']['operations'];
+        }
+        if (!empty($raw['extras']['result_codes']['transaction'])) {
+            $exception->transactionResultCode = $raw['extras']['result_codes']['transaction'];
         }
 
         // Message can contain better info after we've filled out more fields
@@ -123,14 +131,20 @@ class HorizonException extends \ErrorException
         // Additional data used to help the user resolve the error
         $hint = '';
 
-        $message = sprintf('[%s] %s: %s (Requested URL: %s %s) Result Codes : %s',
+        $message = sprintf('[%s] %s: %s (Requested URL: %s %s)',
             $this->httpStatusCode,
             $this->title,
             $this->detail,
             $this->httpMethod,
-            $this->requestedUrl,
-            print_r($this->resultCodes,true)
+            $this->requestedUrl
         );
+
+        if ($this->transactionResultCode) {
+            $message .= sprintf(" Tx Result: %s", $this->transactionResultCode);
+        }
+        if (count($this->operationResultCodes) > 0) {
+            $message .= sprintf(" Op Results: %s", print_r($this->operationResultCodes,true));
+        }
 
         // Rate limit exceeded
         if ('429' == $this->httpStatusCode) {
@@ -257,19 +271,19 @@ class HorizonException extends \ErrorException
      * 
      * @return array
      */
-    function getResultCodes()
+    function getOperationResultCodes()
     {
-        return $this->resultCodes;
+        return $this->operationResultCodes;
     }
     
     /**
      * Set the result codes from Horizon Response.
      * 
-     * @param array $resultCodes
+     * @param array $operationResultCodes
      */
-    function setResultCodes($resultCodes)
+    function setOperationResultCodes($operationResultCodes)
     {
-        $this->resultCodes = $resultCodes;
+        $this->operationResultCodes = $operationResultCodes;
     }
 
     /**
@@ -302,5 +316,21 @@ class HorizonException extends \ErrorException
     public function setRaw($raw)
     {
         $this->raw = $raw;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTransactionResultCode()
+    {
+        return $this->transactionResultCode;
+    }
+
+    /**
+     * @param string $transactionResultCode
+     */
+    public function setTransactionResultCode($transactionResultCode)
+    {
+        $this->transactionResultCode = $transactionResultCode;
     }
 }
