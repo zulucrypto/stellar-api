@@ -10,6 +10,7 @@ use GuzzleHttp\Exception\ServerException;
 use ZuluCrypto\StellarSdk\Horizon\Api\HorizonResponse;
 use ZuluCrypto\StellarSdk\Horizon\Api\PostTransactionResponse;
 use ZuluCrypto\StellarSdk\Horizon\Exception\HorizonException;
+use ZuluCrypto\StellarSdk\Horizon\Exception\PostTransactionException;
 use ZuluCrypto\StellarSdk\Model\Account;
 use ZuluCrypto\StellarSdk\Model\AccountMergeOperation;
 use ZuluCrypto\StellarSdk\Model\CreateAccountOperation;
@@ -149,14 +150,12 @@ class ApiClient
      */
     public function submitB64Transaction($base64TransactionEnvelope)
     {
-        $apiResponse = $this->post(
+        return $this->postTransaction(
             sprintf('/transactions'),
             [
                 'tx' => $base64TransactionEnvelope,
             ]
         );
-
-        return PostTransactionResponse::fromApiResponse($apiResponse);
     }
 
     /**
@@ -474,6 +473,38 @@ class ApiClient
                 sleep(10);
             }
         }
+    }
+
+    /**
+     * Special handling for the /transaction endpoint since we expect additional
+     * transaction-related fields to come back
+     *
+     * @param       $relativeUrl
+     * @param array $parameters
+     * @return PostTransactionResponse
+     * @throws HorizonException
+     */
+    protected function postTransaction($relativeUrl, $parameters = array())
+    {
+        $apiResponse = null;
+
+        try {
+            $apiResponse = $this->httpClient->post($relativeUrl, [ 'form_params' => $parameters ]);
+        }
+        catch (ClientException $e) {
+            // If the response can be json-decoded then it can be converted to a HorizonException
+            $decoded = null;
+            if ($e->getResponse()) {
+                $decoded = Json::mustDecode($e->getResponse()->getBody());
+                throw PostTransactionException::fromRawResponse($relativeUrl, 'POST', $decoded);
+            }
+            // No response, something else went wrong
+            else {
+                throw $e;
+            }
+        }
+
+        return new PostTransactionResponse($apiResponse->getBody());
     }
 
     /**

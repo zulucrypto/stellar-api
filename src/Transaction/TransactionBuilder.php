@@ -4,8 +4,10 @@
 namespace ZuluCrypto\StellarSdk\Transaction;
 
 use phpseclib\Math\BigInteger;
+use ZuluCrypto\StellarSdk\Horizon\Api\PostTransactionResponse;
 use ZuluCrypto\StellarSdk\Horizon\ApiClient;
 use ZuluCrypto\StellarSdk\Horizon\Exception\HorizonException;
+use ZuluCrypto\StellarSdk\Horizon\Exception\PostTransactionException;
 use ZuluCrypto\StellarSdk\Keypair;
 use ZuluCrypto\StellarSdk\Model\StellarAmount;
 use ZuluCrypto\StellarSdk\Signing\PrivateKeySigner;
@@ -13,6 +15,7 @@ use ZuluCrypto\StellarSdk\Signing\SigningInterface;
 use ZuluCrypto\StellarSdk\Util\MathSafety;
 use ZuluCrypto\StellarSdk\Xdr\Iface\XdrEncodableInterface;
 use ZuluCrypto\StellarSdk\Xdr\Type\VariableArray;
+use ZuluCrypto\StellarSdk\Xdr\XdrBuffer;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 use ZuluCrypto\StellarSdk\XdrModel\AccountId;
 use ZuluCrypto\StellarSdk\XdrModel\Asset;
@@ -210,7 +213,9 @@ class TransactionBuilder implements XdrEncodableInterface
 
     /**
      * @param $secretKeyString string|Keypair
-     * @return \ZuluCrypto\StellarSdk\Horizon\Api\HorizonResponse
+     * @return PostTransactionResponse
+     * @throws PostTransactionException
+     * @throws \ErrorException
      */
     public function submit($secretKeyString = null)
     {
