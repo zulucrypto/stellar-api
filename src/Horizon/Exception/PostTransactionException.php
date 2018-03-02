@@ -43,7 +43,8 @@ class PostTransactionException extends HorizonException
         $ex->type = $horizonException->getType();
         $ex->httpStatusCode = $horizonException->getHttpStatusCode();
         $ex->detail = $horizonException->getDetail();
-        $ex->resultCodes = $horizonException->getResultCodes();
+        $ex->operationResultCodes = $horizonException->getOperationResultCodes();
+        $ex->transactionResultCode = $horizonException->getTransactionResultCode();
         $ex->message = $horizonException->getMessage();
         $ex->raw = $horizonException->getRaw();
         $ex->clientException = $horizonException->getClientException();
