@@ -57,6 +57,9 @@ class OperationResult
             case Operation::TYPE_MANAGE_OFFER:
                 return ManageOfferResult::fromXdr($xdr);
                 break;
+            case Operation::TYPE_SET_OPTIONS:
+                return SetOptionsResult::fromXdr($xdr);
+                break;
             default:
                 throw new \ErrorException(sprintf('Unknown operation type: %s', $opType));
         }

@@ -12,6 +12,7 @@ use ZuluCrypto\StellarSdk\XdrModel\ManageOfferResult;
 use ZuluCrypto\StellarSdk\XdrModel\OperationResult;
 use ZuluCrypto\StellarSdk\XdrModel\PathPaymentResult;
 use ZuluCrypto\StellarSdk\XdrModel\PaymentResult;
+use ZuluCrypto\StellarSdk\XdrModel\SetOptionsResult;
 
 class OperationResultTest extends TestCase
 {
@@ -123,6 +124,17 @@ class OperationResultTest extends TestCase
         $result = OperationResult::fromXdr($xdr);
 
         $this->assertTrue($result instanceof ManageOfferResult, 'Incorrect class returned');
+        $this->assertEquals(null, $result->getErrorCode());
+    }
+
+    public function testSetOptionsResultSuccess()
+    {
+        $xdr = new XdrBuffer(base64_decode('AAAAAAAAAAUAAAAAAAAAAA=='));
+
+        /** @var SetOptionsResult $result */
+        $result = OperationResult::fromXdr($xdr);
+
+        $this->assertTrue($result instanceof SetOptionsResult, 'Incorrect class returned');
         $this->assertEquals(null, $result->getErrorCode());
     }
 }
