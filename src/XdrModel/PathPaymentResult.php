@@ -11,15 +11,15 @@ use ZuluCrypto\StellarSdk\Xdr\XdrBuffer;
 class PathPaymentResult extends OperationResult
 {
     // https://github.com/stellar/stellar-core/blob/3c4e356803175f6c2645e4437881cf07522df94d/src/xdr/Stellar-transaction.x#L414
-    const MALFORMED             = 'payment_malformed';
-    const UNDERFUNDED           = 'payment_underfunded';
-    const SRC_NO_TRUST          = 'payment_src_no_trust';
-    const SRC_NOT_AUTHORIZED    = 'payment_src_not_authorized';
-    const NO_DESTINATION        = 'payment_no_destination';
-    const NO_TRUST              = 'payment_no_trust';
-    const NOT_AUTHORIZED        = 'payment_not_authorized';
-    const LINE_FULL             = 'payment_line_full';
-    const NO_ISSUER             = 'payment_no_issuer';
+    const MALFORMED             = 'path_payment_malformed';
+    const UNDERFUNDED           = 'path_payment_underfunded';
+    const SRC_NO_TRUST          = 'path_payment_src_no_trust';
+    const SRC_NOT_AUTHORIZED    = 'path_payment_src_not_authorized';
+    const NO_DESTINATION        = 'path_payment_no_destination';
+    const NO_TRUST              = 'path_payment_no_trust';
+    const NOT_AUTHORIZED        = 'path_payment_not_authorized';
+    const LINE_FULL             = 'path_payment_line_full';
+    const NO_ISSUER             = 'path_payment_no_issuer';
     const TOO_FEW_OFFERS        = 'path_payment_too_few_offers';
     const OFFER_CROSS_SELF      = 'path_payment_offer_cross_self';
     const OVER_SENDMAX          = 'path_payment_over_sendmax';
