@@ -6,6 +6,7 @@ namespace ZuluCrypto\StellarSdk\Test\Unit\XdrModel;
 
 use PHPUnit\Framework\TestCase;
 use ZuluCrypto\StellarSdk\Xdr\XdrBuffer;
+use ZuluCrypto\StellarSdk\XdrModel\AllowTrustResult;
 use ZuluCrypto\StellarSdk\XdrModel\Asset;
 use ZuluCrypto\StellarSdk\XdrModel\ChangeTrustResult;
 use ZuluCrypto\StellarSdk\XdrModel\CreateAccountResult;
@@ -147,6 +148,18 @@ class OperationResultTest extends TestCase
         $result = OperationResult::fromXdr($xdr);
 
         $this->assertTrue($result instanceof ChangeTrustResult, 'Incorrect class returned');
+        $this->assertEquals(null, $result->getErrorCode());
+    }
+
+    public function testAllowTrustResultSuccess()
+    {
+        $xdr = new XdrBuffer(base64_decode('AAAAAAAAAAcAAAAAAAAAAA=='));
+
+        /** @var AllowTrustResult $result */
+        $result = OperationResult::fromXdr($xdr);
+        print get_class($result);
+
+        $this->assertTrue($result instanceof AllowTrustResult, 'Incorrect class returned');
         $this->assertEquals(null, $result->getErrorCode());
     }
 }

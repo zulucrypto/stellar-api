@@ -63,6 +63,9 @@ class OperationResult
             case Operation::TYPE_CHANGE_TRUST:
                 return ChangeTrustResult::fromXdr($xdr);
                 break;
+            case Operation::TYPE_ALLOW_TRUST:
+                return AllowTrustResult::fromXdr($xdr);
+                break;
             default:
                 throw new \ErrorException(sprintf('Unknown operation type: %s', $opType));
         }
