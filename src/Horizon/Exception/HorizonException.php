@@ -74,6 +74,8 @@ class HorizonException extends \ErrorException
     protected $resultCodes;
 
     /**
+     * NOTE: changes here may requires changes to PostTransactionException::fromHorizonException
+     *
      * @param                 $requestedUrl
      * @param                 $httpMethod
      * @param                 $raw
@@ -268,5 +270,37 @@ class HorizonException extends \ErrorException
     function setResultCodes($resultCodes)
     {
         $this->resultCodes = $resultCodes;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHttpMethod()
+    {
+        return $this->httpMethod;
+    }
+
+    /**
+     * @param string $httpMethod
+     */
+    public function setHttpMethod($httpMethod)
+    {
+        $this->httpMethod = $httpMethod;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRaw()
+    {
+        return $this->raw;
+    }
+
+    /**
+     * @param array $raw
+     */
+    public function setRaw($raw)
+    {
+        $this->raw = $raw;
     }
 }
