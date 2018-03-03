@@ -12,6 +12,7 @@ use ZuluCrypto\StellarSdk\XdrModel\Asset;
 use ZuluCrypto\StellarSdk\XdrModel\ChangeTrustResult;
 use ZuluCrypto\StellarSdk\XdrModel\CreateAccountResult;
 use ZuluCrypto\StellarSdk\XdrModel\InflationResult;
+use ZuluCrypto\StellarSdk\XdrModel\ManageDataResult;
 use ZuluCrypto\StellarSdk\XdrModel\ManageOfferResult;
 use ZuluCrypto\StellarSdk\XdrModel\OperationResult;
 use ZuluCrypto\StellarSdk\XdrModel\PathPaymentResult;
@@ -186,6 +187,17 @@ class OperationResultTest extends TestCase
         $result = OperationResult::fromXdr($xdr);
 
         $this->assertTrue($result instanceof InflationResult, 'Incorrect class returned');
+        $this->assertEquals(null, $result->getErrorCode());
+    }
+
+    public function testManageDataResultSuccess()
+    {
+        $xdr = new XdrBuffer(base64_decode('AAAAAAAAAAoAAAAAAAAAAA=='));
+
+        /** @var ManageDataResult $result */
+        $result = OperationResult::fromXdr($xdr);
+
+        $this->assertTrue($result instanceof ManageDataResult, 'Incorrect class returned');
         $this->assertEquals(null, $result->getErrorCode());
     }
 }
