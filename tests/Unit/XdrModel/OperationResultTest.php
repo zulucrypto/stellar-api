@@ -6,6 +6,7 @@ namespace ZuluCrypto\StellarSdk\Test\Unit\XdrModel;
 
 use PHPUnit\Framework\TestCase;
 use ZuluCrypto\StellarSdk\Xdr\XdrBuffer;
+use ZuluCrypto\StellarSdk\XdrModel\AccountMergeResult;
 use ZuluCrypto\StellarSdk\XdrModel\AllowTrustResult;
 use ZuluCrypto\StellarSdk\XdrModel\Asset;
 use ZuluCrypto\StellarSdk\XdrModel\ChangeTrustResult;
@@ -157,9 +158,22 @@ class OperationResultTest extends TestCase
 
         /** @var AllowTrustResult $result */
         $result = OperationResult::fromXdr($xdr);
-        print get_class($result);
 
         $this->assertTrue($result instanceof AllowTrustResult, 'Incorrect class returned');
         $this->assertEquals(null, $result->getErrorCode());
+    }
+
+    public function testAccountMergeResultSuccess()
+    {
+        $xdr = new XdrBuffer(base64_decode('AAAAAAAAAAgAAAAAAAAAAAHJwxwAAAAA'));
+
+        /** @var AccountMergeResult $result */
+        $result = OperationResult::fromXdr($xdr);
+
+        $this->assertTrue($result instanceof AccountMergeResult, 'Incorrect class returned');
+        $this->assertEquals(null, $result->getErrorCode());
+
+        // Balance is 3 XLM - fee
+        $this->assertEquals(2.99999, $result->getTransferredBalance()->getScaledValue());
     }
 }
