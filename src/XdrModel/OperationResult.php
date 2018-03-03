@@ -69,6 +69,9 @@ class OperationResult
             case Operation::TYPE_ACCOUNT_MERGE:
                 return AccountMergeResult::fromXdr($xdr);
                 break;
+            case Operation::TYPE_INFLATION:
+                return InflationResult::fromXdr($xdr);
+                break;
             default:
                 throw new \ErrorException(sprintf('Unknown operation type: %s', $opType));
         }
