@@ -4,26 +4,26 @@
 namespace ZuluCrypto\StellarSdk\XdrModel;
 
 
+use phpseclib\Math\BigInteger;
 use ZuluCrypto\StellarSdk\Model\StellarAmount;
 use ZuluCrypto\StellarSdk\Xdr\XdrBuffer;
 
 class TransactionResult
 {
-    const SUCCESS               = 0;    // all operations suceeded
-    const FAILED                = -1;   // one or more operations failed
-    const TOO_EARLY             = -2;   // ledger close time before min timebounds
-    const TOO_LATE              = -3;   // ledger close time after max timebounds
-    const MISSING_OPERATION     = -4;   // no operations specified
-    const BAD_SEQ               = -5;   // sequence number not correct for source account
-    const BAD_AUTH              = -6;   // too few valid signatures or wrong network
-    const INSUFFICIENT_BALANCE  = -7;   // account would be below the reserve after this tx
-    const NO_ACCOUNT            = -8;   // source account not found
-    const INSUFFICIENT_FEE      = -9;   // fee was too small
-    const BAD_AUTH_EXTRA        = -10;  // included extra signatures
-    const INTERNAL_ERROR        = -11;  // unknown error
+    const SUCCESS               = 'success';    // all operations suceeded
+    const FAILED                = 'failed';   // one or more operations failed
+    const TOO_EARLY             = 'too_early';   // ledger close time before min timebounds
+    const TOO_LATE              = 'too_late';   // ledger close time after max timebounds
+    const MISSING_OPERATION     = 'missing_operation';   // no operations specified
+    const BAD_SEQ               = 'bad_seq';   // sequence number not correct for source account
+    const BAD_AUTH              = 'bad_auth';   // too few valid signatures or wrong network
+    const INSUFFICIENT_BALANCE  = 'insufficient_balance';   // account would be below the reserve after this tx
+    const NO_ACCOUNT            = 'no_account';   // source account not found
+    const INSUFFICIENT_FEE      = 'insufficient_fee';   // fee was too small
+    const BAD_AUTH_EXTRA        = 'bad_auth_extra';  // included extra signatures
+    const INTERNAL_ERROR        = 'internal_error';  // unknown error
 
     /**
-     * This value is stored internally as stroops
      * @var StellarAmount
      */
     protected $feeCharged;
@@ -56,10 +56,27 @@ class TransactionResult
         $model = new TransactionResult();
 
         // This is the fee in stroops
-        $model->feeCharged = new StellarAmount($xdr->readInteger64());
+        $model->feeCharged = new StellarAmount(new BigInteger($xdr->readInteger64()));
 
         $rawCode = $xdr->readInteger();
-        $model->resultCode = $rawCode;
+        $resultCodeMap = [
+            '0' => 'success',
+            '-1' => static::FAILED,
+            '-2' => static::TOO_EARLY,
+            '-3' => static::TOO_LATE,
+            '-4' => static::MISSING_OPERATION,
+            '-5' => static::BAD_SEQ,
+            '-6' => static::BAD_AUTH,
+            '-7' => static::INSUFFICIENT_BALANCE,
+            '-8' => static::NO_ACCOUNT,
+            '-9' => static::INSUFFICIENT_FEE,
+            '-10' => static::BAD_AUTH_EXTRA,
+            '-11' => static::INTERNAL_ERROR,
+        ];
+        if (!isset($resultCodeMap[$rawCode])) {
+            throw new \ErrorException(sprintf('Unknown result code %s', $rawCode));
+        }
+        $model->resultCode = $resultCodeMap[$rawCode];
 
         $numOperations = $xdr->readInteger();
         for ($i=0; $i < $numOperations; $i++) {
@@ -89,23 +106,19 @@ class TransactionResult
     }
 
     /**
-     * Returns a BigInteger representing the fee in stroops
-     *
-     * @return \phpseclib\Math\BigInteger
+     * @return StellarAmount
      */
-    public function getFeeStroops()
+    public function getFeeCharged()
     {
-        return $this->feeCharged->getUnscaledBigInteger();
+        return $this->feeCharged;
     }
 
     /**
-     * Returns the fee in XLM
-     *
-     * @return float|int
+     * @return string
      */
-    public function getFee()
+    public function getResultCode()
     {
-        return $this->feeCharged->getScaledValue();
+        return $this->resultCode;
     }
 
     /**
