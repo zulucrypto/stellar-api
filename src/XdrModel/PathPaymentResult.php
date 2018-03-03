@@ -88,7 +88,6 @@ class PathPaymentResult extends OperationResult
         // Normal XDR parsing https://github.com/stellar/stellar-core/blob/3c4e356803175f6c2645e4437881cf07522df94d/src/xdr/Stellar-transaction.x#L441
         else {
             $numOffersClaimed = $xdr->readUnsignedInteger();
-            print "Claimed $numOffersClaimed offers\n";
             for ($i=0; $i < $numOffersClaimed; $i++) {
                 $model->claimedOffers[] = ClaimOfferAtom::fromXdr($xdr);
             }
