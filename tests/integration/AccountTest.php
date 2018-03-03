@@ -64,6 +64,6 @@ class AccountTest extends IntegrationTest
         sleep(1);
         $account = $this->horizonServer->getAccount($paymentDestKeypair->getPublicKey());
 
-        $this->assertCount(3, $account->getPayments());
+        $this->assertCount(2, $account->getPayments());
     }
 }
