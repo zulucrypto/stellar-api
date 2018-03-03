@@ -1,3 +1,15 @@
+### 0.5.0
+
+This release adds parsing of the Transaction response so you can get detailed information
+on the result of each operation.
+
+ * When submitting a transaction, you will now get back an instance of `PostTransactionResponse`
+ * If a transaction fails due to a failing operation, a `PostTransactionException` is now thrown
+ 
+These two new classes have methods for retrieveing details about each operation within the transaction.
+
+In addition, the text transaction result and operation results from the Horizon response are now included (thanks @omarfurrer)  
+
 ### 0.4.0
 
 **Breaking Changes / Incompatibilities**
