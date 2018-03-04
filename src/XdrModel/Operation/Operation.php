@@ -6,6 +6,7 @@ namespace ZuluCrypto\StellarSdk\XdrModel\Operation;
 
 use ZuluCrypto\StellarSdk\Keypair;
 use ZuluCrypto\StellarSdk\Xdr\Iface\XdrEncodableInterface;
+use ZuluCrypto\StellarSdk\Xdr\XdrBuffer;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 use ZuluCrypto\StellarSdk\XdrModel\AccountId;
 
@@ -96,5 +97,36 @@ abstract class Operation implements XdrEncodableInterface
         $bytes .= XdrEncoder::unsignedInteger($this->type);
 
         return $bytes;
+    }
+
+    /**
+     * @param XdrBuffer $xdr
+     * @return Operation
+     * @throws \ErrorException
+     */
+    public static function fromXdr(XdrBuffer $xdr)
+    {
+        /** @var Operation $model */
+        $model = null;
+        $hasSourceAccount = $xdr->readBoolean();
+
+        $sourceAccount = null;
+        if ($hasSourceAccount) {
+            $sourceAccount = AccountId::fromXdr($xdr);
+        }
+
+        $type = $xdr->readUnsignedInteger();
+
+        switch ($type) {
+            case Operation::TYPE_ACCOUNT_MERGE:
+                $model = AccountMergeOp::fromXdr($xdr);
+                break;
+            default:
+                throw new \InvalidArgumentException('unrecognized operation type %s', $type);
+        }
+
+        $model->sourceAccount = $sourceAccount;
+
+        return $model;
     }
 }

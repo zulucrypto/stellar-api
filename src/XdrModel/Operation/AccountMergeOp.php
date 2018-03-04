@@ -5,6 +5,7 @@ namespace ZuluCrypto\StellarSdk\XdrModel\Operation;
 
 
 use ZuluCrypto\StellarSdk\Keypair;
+use ZuluCrypto\StellarSdk\Xdr\XdrBuffer;
 use ZuluCrypto\StellarSdk\XdrModel\AccountId;
 
 class AccountMergeOp extends Operation
@@ -36,6 +37,22 @@ class AccountMergeOp extends Operation
         $bytes .= $this->destination->toXdr();
 
         return $bytes;
+    }
+
+    /**
+     * NOTE: This only parses the XDR that's specific to this operation and cannot
+     * load a full Operation
+     *
+     * @deprecated Do not call this directly, instead call Operation::fromXdr()
+     * @param XdrBuffer $xdr
+     * @return AccountMergeOp
+     * @throws \ErrorException
+     */
+    public static function fromXdr(XdrBuffer $xdr)
+    {
+        $destination = AccountId::fromXdr($xdr);
+
+        return new AccountMergeOp($destination->getAccountIdString());
     }
 
     /**
