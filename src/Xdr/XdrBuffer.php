@@ -120,6 +120,27 @@ class XdrBuffer
     }
 
     /**
+     * @return bool|string
+     * @throws \ErrorException
+     */
+    public function readOpaqueVariable($maxLength = null)
+    {
+        $length = $this->readUnsignedInteger();
+        $paddedLength = $this->roundTo4($length);
+
+        if ($maxLength !== null && $length > $maxLength) {
+            throw new \InvalidArgumentException(sprintf('length of %s exceeds max length of %s', $length, $maxLength));
+        }
+
+        $this->assertBytesRemaining($paddedLength);
+
+        $data = XdrDecoder::opaqueFixed(substr($this->xdrBytes, $this->position), $length);
+        $this->position += $paddedLength;
+
+        return $data;
+    }
+
+    /**
      * @param null $maxLength
      * @return bool|string
      * @throws \ErrorException
