@@ -4,6 +4,7 @@
 namespace ZuluCrypto\StellarSdk\XdrModel\Operation;
 
 
+use ZuluCrypto\StellarSdk\Xdr\XdrBuffer;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 use ZuluCrypto\StellarSdk\XdrModel\AccountId;
 use ZuluCrypto\StellarSdk\XdrModel\Asset;
@@ -65,6 +66,35 @@ class AllowTrustOp extends Operation
         $bytes .= XdrEncoder::boolean($this->isAuthorized);
 
         return $bytes;
+    }
+
+    /**
+     * @deprecated Do not call this directly, instead call Operation::fromXdr()
+     * @param XdrBuffer $xdr
+     * @return AllowTrustOp|Operation
+     * @throws \ErrorException
+     */
+    public static function fromXdr(XdrBuffer $xdr)
+    {
+        $trustedAccount = AccountId::fromXdr($xdr);
+
+        // Needs to be manually decoded since issuer is not present in the XDR
+        $assetType = $xdr->readUnsignedInteger();
+        $assetCode = null;
+        if ($assetType === Asset::TYPE_ALPHANUM_4) {
+            $assetCode = $xdr->readOpaqueFixedString(4);
+        }
+        if ($assetType === Asset::TYPE_ALPHANUM_12) {
+            $assetCode = $xdr->readOpaqueFixedString(12);
+        }
+
+        $asset = new Asset($assetType);
+        $asset->setAssetCode($assetCode);
+
+        $model = new AllowTrustOp($asset, $trustedAccount);
+        $model->setIsAuthorized($xdr->readBoolean());
+
+        return $model;
     }
 
     /**
