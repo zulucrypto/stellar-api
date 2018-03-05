@@ -7,6 +7,7 @@ namespace ZuluCrypto\StellarSdk\XdrModel\Operation;
 use phpseclib\Math\BigInteger;
 use ZuluCrypto\StellarSdk\Keypair;
 use ZuluCrypto\StellarSdk\Model\StellarAmount;
+use ZuluCrypto\StellarSdk\Xdr\XdrBuffer;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 use ZuluCrypto\StellarSdk\XdrModel\AccountId;
 use ZuluCrypto\StellarSdk\XdrModel\Asset;
@@ -95,6 +96,23 @@ class PaymentOp extends Operation
     }
 
     /**
+     * @deprecated Do not call this directly, instead call Operation::fromXdr()
+     * @param XdrBuffer $xdr
+     * @return Operation|PaymentOp
+     * @throws \ErrorException
+     */
+    public static function fromXdr(XdrBuffer $xdr)
+    {
+        $op = new PaymentOp();
+
+        $op->destination = AccountId::fromXdr($xdr);
+        $op->asset = Asset::fromXdr($xdr);
+        $op->amount = StellarAmount::fromXdr($xdr);
+
+        return $op;
+    }
+
+    /**
      * @param int|BigInteger $amount int representing lumens or BigInteger representing stroops
      */
     public function setAmount($amount)
@@ -116,5 +134,37 @@ class PaymentOp extends Operation
     public function setAmountInStroops(BigInteger $stroops)
     {
         $this->amount = new StellarAmount($stroops);
+    }
+
+    /**
+     * @return AccountId
+     */
+    public function getDestination()
+    {
+        return $this->destination;
+    }
+
+    /**
+     * @param AccountId $destination
+     */
+    public function setDestination($destination)
+    {
+        $this->destination = $destination;
+    }
+
+    /**
+     * @return Asset
+     */
+    public function getAsset()
+    {
+        return $this->asset;
+    }
+
+    /**
+     * @param Asset $asset
+     */
+    public function setAsset($asset)
+    {
+        $this->asset = $asset;
     }
 }
