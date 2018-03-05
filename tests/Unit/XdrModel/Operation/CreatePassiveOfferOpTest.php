@@ -1,0 +1,41 @@
+<?php
+
+
+namespace ZuluCrypto\StellarSdk\Test\Unit\XdrModel\Operation;
+
+
+use PHPUnit\Framework\TestCase;
+use ZuluCrypto\StellarSdk\Keypair;
+use ZuluCrypto\StellarSdk\Xdr\XdrBuffer;
+use ZuluCrypto\StellarSdk\XdrModel\Asset;
+use ZuluCrypto\StellarSdk\XdrModel\Operation\CreatePassiveOfferOp;
+use ZuluCrypto\StellarSdk\XdrModel\Operation\Operation;
+use ZuluCrypto\StellarSdk\XdrModel\Price;
+
+class CreatePassiveOfferOpTest extends TestCase
+{
+    public function testFromXdr()
+    {
+        $sellingAsset = Asset::newCustomAsset('SELLING', Keypair::newFromRandom());
+        $buyingAsset = Asset::newCustomAsset('BUYING', Keypair::newFromRandom());
+        $amount = 9000.00001;
+        $price = new Price(1, 4000);
+
+        $sourceOp = new CreatePassiveOfferOp(
+            $sellingAsset,
+            $buyingAsset,
+            $amount,
+            $price
+        );
+
+        /** @var CreatePassiveOfferOp $parsed */
+        $parsed = Operation::fromXdr(new XdrBuffer($sourceOp->toXdr()));
+
+        $this->assertTrue($parsed instanceof CreatePassiveOfferOp);
+
+        $this->assertEquals($sellingAsset->getAssetCode(), $parsed->getSellingAsset()->getAssetCode());
+        $this->assertEquals($buyingAsset->getAssetCode(), $parsed->getBuyingAsset()->getAssetCode());
+        $this->assertEquals($amount, $parsed->getAmount()->getScaledValue());
+        $this->assertEquals(.00025, $parsed->getPrice()->toFloat());
+    }
+}
