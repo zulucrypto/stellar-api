@@ -8,6 +8,7 @@ use phpseclib\Math\BigInteger;
 use ZuluCrypto\StellarSdk\Model\AssetAmount;
 use ZuluCrypto\StellarSdk\Model\StellarAmount;
 use ZuluCrypto\StellarSdk\Util\Debug;
+use ZuluCrypto\StellarSdk\Xdr\XdrBuffer;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 use ZuluCrypto\StellarSdk\XdrModel\AccountId;
 use ZuluCrypto\StellarSdk\XdrModel\Asset;
@@ -83,6 +84,28 @@ class ManageOfferOp extends Operation
         $bytes .= XdrEncoder::unsignedInteger64($this->offerId);
 
         return $bytes;
+    }
+
+    /**
+     * @deprecated Do not call this directly, instead call Operation::fromXdr()
+     * @param XdrBuffer $xdr
+     * @return ManageOfferOp|Operation
+     * @throws \ErrorException
+     */
+    public static function fromXdr(XdrBuffer $xdr)
+    {
+        $sellingAsset = Asset::fromXdr($xdr);
+        $buyingAsset = Asset::fromXdr($xdr);
+        $amount = StellarAmount::fromXdr($xdr);
+        $price = Price::fromXdr($xdr);
+        $offerId = $xdr->readUnsignedInteger64();
+
+        return new ManageOfferOp($sellingAsset,
+            $buyingAsset,
+            $amount->getUnscaledBigInteger(),
+            $price,
+            $offerId
+        );
     }
 
     /**
