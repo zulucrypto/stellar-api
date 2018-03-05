@@ -6,6 +6,7 @@ namespace ZuluCrypto\StellarSdk\Model;
 
 use phpseclib\Math\BigInteger;
 use ZuluCrypto\StellarSdk\Util\MathSafety;
+use ZuluCrypto\StellarSdk\Xdr\XdrBuffer;
 
 /**
  * Helper class for working with stellar values
@@ -44,6 +45,18 @@ class StellarAmount
     public static function newMaximum()
     {
         return new StellarAmount(new BigInteger('9223372036854775807'));
+    }
+
+    /**
+     * Reads a StellarAmount from a SIGNED 64-bit integer
+     *
+     * @param XdrBuffer $xdr
+     * @return StellarAmount
+     * @throws \ErrorException
+     */
+    public static function fromXdr(XdrBuffer $xdr)
+    {
+        return new StellarAmount(new BigInteger($xdr->readInteger64()));
     }
 
     /**
