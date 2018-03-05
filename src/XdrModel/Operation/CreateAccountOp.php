@@ -28,11 +28,18 @@ class CreateAccountOp extends Operation
     /**
      * @param AccountId      $newAccount
      * @param int|BigInteger $startingBalance int representing lumens or BigInteger representing stroops
-     * @param AccountId|null $sourceAccount
+     * @param null|string|Keypair|AccountId $sourceAccountId
      * @throws \ErrorException
      */
-    public function __construct(AccountId $newAccount, $startingBalance, AccountId $sourceAccount = null)
+    public function __construct(AccountId $newAccount, $startingBalance, $sourceAccount = null)
     {
+        if ($sourceAccount instanceof Keypair) {
+            $sourceAccount = new AccountId($sourceAccount->getPublicKey());
+        }
+        if (is_string($sourceAccount)) {
+            $sourceAccount = new AccountId($sourceAccount);
+        }
+
         parent::__construct( Operation::TYPE_CREATE_ACCOUNT, $sourceAccount);
 
         $this->newAccount = $newAccount;
