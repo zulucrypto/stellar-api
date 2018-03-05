@@ -122,11 +122,27 @@ abstract class Operation implements XdrEncodableInterface
                 $model = AccountMergeOp::fromXdr($xdr);
                 break;
             default:
-                throw new \InvalidArgumentException('unrecognized operation type %s', $type);
+                throw new \InvalidArgumentException(sprintf('unrecognized operation type %s', $type));
         }
 
         $model->sourceAccount = $sourceAccount;
 
         return $model;
+    }
+
+    /**
+     * @return AccountId
+     */
+    public function getSourceAccount()
+    {
+        return $this->sourceAccount;
+    }
+
+    /**
+     * @param AccountId $sourceAccount
+     */
+    public function setSourceAccount(AccountId $sourceAccount)
+    {
+        $this->sourceAccount = $sourceAccount;
     }
 }
