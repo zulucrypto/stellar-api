@@ -120,6 +120,24 @@ class XdrBuffer
     }
 
     /**
+     * @param null $maxLength
+     * @return bool|string
+     * @throws \ErrorException
+     */
+    public function readString($maxLength = null)
+    {
+        $strLen = $this->readUnsignedInteger();
+        if ($strLen > $maxLength) throw new \InvalidArgumentException(sprintf('maxLength of %s exceeded (string is %s bytes)', $maxLength, $strLen));
+
+        $this->assertBytesRemaining($strLen);
+
+        $data = XdrDecoder::opaqueFixed(substr($this->xdrBytes, $this->position), $strLen);
+        $this->position += $strLen;
+
+        return $data;
+    }
+
+    /**
      * @return bool
      * @throws \ErrorException
      */
