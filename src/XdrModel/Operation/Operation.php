@@ -136,6 +136,9 @@ abstract class Operation implements XdrEncodableInterface
             case Operation::TYPE_SET_OPTIONS:
                 $model = SetOptionsOp::fromXdr($xdr);
                 break;
+            case Operation::TYPE_CHANGE_TRUST:
+                $model = ChangeTrustOp::fromXdr($xdr);
+                break;
 
             case Operation::TYPE_ACCOUNT_MERGE:
                 $model = AccountMergeOp::fromXdr($xdr);

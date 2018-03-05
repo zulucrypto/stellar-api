@@ -6,6 +6,7 @@ namespace ZuluCrypto\StellarSdk\XdrModel\Operation;
 use phpseclib\Math\BigInteger;
 use ZuluCrypto\StellarSdk\Model\StellarAmount;
 use ZuluCrypto\StellarSdk\Util\MathSafety;
+use ZuluCrypto\StellarSdk\Xdr\XdrBuffer;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 use ZuluCrypto\StellarSdk\XdrModel\AccountId;
 use ZuluCrypto\StellarSdk\XdrModel\Asset;
@@ -51,6 +52,20 @@ class ChangeTrustOp extends Operation
         $bytes .= XdrEncoder::signedBigInteger64($this->limit->getUnscaledBigInteger());
 
         return $bytes;
+    }
+
+    /**
+     * @deprecated Do not call this directly, instead call Operation::fromXdr()
+     * @param XdrBuffer $xdr
+     * @return ChangeTrustOp|Operation
+     * @throws \ErrorException
+     */
+    public static function fromXdr(XdrBuffer $xdr)
+    {
+        $asset = Asset::fromXdr($xdr);
+        $limit = StellarAmount::fromXdr($xdr);
+
+        return new ChangeTrustOp($asset, $limit->getUnscaledBigInteger());
     }
 
     /**
