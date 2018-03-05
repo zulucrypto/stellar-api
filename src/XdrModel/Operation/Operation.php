@@ -148,6 +148,9 @@ abstract class Operation implements XdrEncodableInterface
             case Operation::TYPE_INFLATION:
                 $model = new InflationOp(); // no additional XDR to parse
                 break;
+            case Operation::TYPE_MANAGE_DATA:
+                $model = ManageDataOp::fromXdr($xdr);
+                break;
             default:
                 throw new \InvalidArgumentException(sprintf('unrecognized operation type %s', $type));
         }

@@ -5,6 +5,7 @@ namespace ZuluCrypto\StellarSdk\XdrModel\Operation;
 
 
 use ZuluCrypto\StellarSdk\Util\Debug;
+use ZuluCrypto\StellarSdk\Xdr\XdrBuffer;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 
 /**
@@ -52,6 +53,24 @@ class ManageDataOp extends Operation
         }
 
         return $bytes;
+    }
+
+    /**
+     * @deprecated Do not call this directly, instead call Operation::fromXdr()
+     * @param XdrBuffer $xdr
+     * @return ManageDataOp|Operation
+     * @throws \ErrorException
+     */
+    public static function fromXdr(XdrBuffer $xdr)
+    {
+        $key = $xdr->readString(64);
+
+        $value = null;
+        if ($xdr->readBoolean()) {
+            $value = $xdr->readOpaqueVariable(64);
+        }
+
+        return new ManageDataOp($key, $value);
     }
 
     /**
