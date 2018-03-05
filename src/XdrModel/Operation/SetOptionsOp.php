@@ -131,14 +131,22 @@ class SetOptionsOp extends Operation
     {
         if ($isRequired) {
             $this->setFlags   = $this->setFlags | static::FLAG_AUTH_REQUIRED;
-            $this->clearFlags = $this->clearFlags & !(static::FLAG_AUTH_REQUIRED);
+            $this->clearFlags = $this->clearFlags & ~(static::FLAG_AUTH_REQUIRED);
         }
         else {
-            $this->setFlags   = $this->setFlags & !(static::FLAG_AUTH_REQUIRED);
+            $this->setFlags   = $this->setFlags & ~(static::FLAG_AUTH_REQUIRED);
             $this->clearFlags = $this->clearFlags | static::FLAG_AUTH_REQUIRED;
         }
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAuthRequired()
+    {
+        return boolval($this->setFlags & static::FLAG_AUTH_REQUIRED);
     }
 
     /**
@@ -151,14 +159,22 @@ class SetOptionsOp extends Operation
     {
         if ($isRevocable) {
             $this->setFlags   = $this->setFlags | static::FLAG_AUTH_REVOCABLE;
-            $this->clearFlags = $this->clearFlags & !(static::FLAG_AUTH_REVOCABLE);
+            $this->clearFlags = $this->clearFlags & ~(static::FLAG_AUTH_REVOCABLE);
         }
         else {
-            $this->setFlags   = $this->setFlags & !(static::FLAG_AUTH_REVOCABLE);
+            $this->setFlags   = $this->setFlags & ~(static::FLAG_AUTH_REVOCABLE);
             $this->clearFlags = $this->clearFlags | static::FLAG_AUTH_REVOCABLE;
         }
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAuthRevocable()
+    {
+        return boolval($this->setFlags & static::FLAG_AUTH_REVOCABLE);
     }
 
     /**
@@ -309,5 +325,31 @@ class SetOptionsOp extends Operation
     public function getSigner()
     {
         return $this->signer;
+    }
+
+    /**
+     * @param $clearFlags
+     */
+    protected function applyClearFlags($clearFlags)
+    {
+        if ($clearFlags & static::FLAG_AUTH_REQUIRED) {
+            $this->setAuthRequired(false);
+        }
+        if ($clearFlags & static::FLAG_AUTH_REVOCABLE) {
+            $this->setAuthRevocable(false);
+        }
+    }
+
+    /**
+     * @param $setFlags
+     */
+    protected function applySetFlags($setFlags)
+    {
+        if ($setFlags & static::FLAG_AUTH_REQUIRED) {
+            $this->setAuthRequired(true);
+        }
+        if ($setFlags & static::FLAG_AUTH_REVOCABLE) {
+            $this->setAuthRevocable(true);
+        }
     }
 }
