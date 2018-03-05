@@ -133,6 +133,9 @@ abstract class Operation implements XdrEncodableInterface
             case Operation::TYPE_CREATE_PASSIVE_OFFER:
                 $model = CreatePassiveOfferOp::fromXdr($xdr);
                 break;
+            case Operation::TYPE_SET_OPTIONS:
+                $model = SetOptionsOp::fromXdr($xdr);
+                break;
 
             case Operation::TYPE_ACCOUNT_MERGE:
                 $model = AccountMergeOp::fromXdr($xdr);

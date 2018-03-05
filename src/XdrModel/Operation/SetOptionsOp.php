@@ -4,6 +4,7 @@
 namespace ZuluCrypto\StellarSdk\XdrModel\Operation;
 
 
+use ZuluCrypto\StellarSdk\Xdr\XdrBuffer;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 use ZuluCrypto\StellarSdk\XdrModel\AccountId;
 use ZuluCrypto\StellarSdk\XdrModel\Signer;
@@ -108,6 +109,56 @@ class SetOptionsOp extends Operation
         $bytes .= XdrEncoder::optional($this->signer);
 
         return $bytes;
+    }
+
+    /**
+     * @deprecated Do not call this directly, instead call Operation::fromXdr()
+     * @param XdrBuffer $xdr
+     * @return Operation|SetOptionsOp
+     * @throws \ErrorException
+     */
+    public static function fromXdr(XdrBuffer $xdr)
+    {
+        $model = new SetOptionsOp();
+
+        // inflation destination
+        if ($xdr->readBoolean()) {
+            $model->inflationDestinationAccount = AccountId::fromXdr($xdr);
+        }
+        // clear flags
+        if ($xdr->readBoolean()) {
+            $model->applyClearFlags($xdr->readUnsignedInteger());
+        }
+        // set flags
+        if ($xdr->readBoolean()) {
+            $model->applySetFlags($xdr->readUnsignedInteger());
+        }
+        // master weight
+        if ($xdr->readBoolean()) {
+            $model->masterWeight = $xdr->readUnsignedInteger();
+        }
+        // low threshold
+        if ($xdr->readBoolean()) {
+            $model->lowThreshold = $xdr->readUnsignedInteger();
+        }
+        // medium threshold
+        if ($xdr->readBoolean()) {
+            $model->mediumThreshold = $xdr->readUnsignedInteger();
+        }
+        // high threshold
+        if ($xdr->readBoolean()) {
+            $model->highThreshold = $xdr->readUnsignedInteger();
+        }
+        // home domain
+        if ($xdr->readBoolean()) {
+            $model->homeDomain = $xdr->readString(32);
+        }
+        // signer
+        if ($xdr->readBoolean()) {
+            $model->signer = Signer::fromXdr($xdr);
+        }
+
+        return $model;
     }
 
     /**
