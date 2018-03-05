@@ -127,12 +127,13 @@ class XdrBuffer
     public function readString($maxLength = null)
     {
         $strLen = $this->readUnsignedInteger();
+        $paddedLength = $this->roundTo4($strLen);
         if ($strLen > $maxLength) throw new \InvalidArgumentException(sprintf('maxLength of %s exceeded (string is %s bytes)', $maxLength, $strLen));
 
-        $this->assertBytesRemaining($strLen);
+        $this->assertBytesRemaining($paddedLength);
 
         $data = XdrDecoder::opaqueFixed(substr($this->xdrBytes, $this->position), $strLen);
-        $this->position += $strLen;
+        $this->position += $paddedLength;
 
         return $data;
     }
@@ -161,5 +162,18 @@ class XdrBuffer
         if ($this->position + $numBytes > $this->size) {
             throw new \ErrorException('Unexpected end of XDR data');
         }
+    }
+
+    /**
+     * rounds $number up to the nearest value that's a multiple of 4
+     *
+     * @param $number
+     * @return int
+     */
+    protected function roundTo4($number)
+    {
+        $remainder = floor($number / 4);
+
+        return $number + $remainder;
     }
 }
