@@ -4,6 +4,7 @@ namespace ZuluCrypto\StellarSdk\XdrModel;
 
 
 use ZuluCrypto\StellarSdk\Xdr\Iface\XdrEncodableInterface;
+use ZuluCrypto\StellarSdk\Xdr\XdrBuffer;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 
 /**
@@ -41,6 +42,19 @@ class Signer implements XdrEncodableInterface
         $bytes .= XdrEncoder::unsignedInteger($this->weight);
 
         return $bytes;
+    }
+
+    /**
+     * @param XdrBuffer $xdr
+     * @return Signer
+     * @throws \ErrorException
+     */
+    public static function fromXdr(XdrBuffer $xdr)
+    {
+        $signerKey = SignerKey::fromXdr($xdr);
+        $weight = $xdr->readUnsignedInteger();
+
+        return new Signer($signerKey, $weight);
     }
 
     /**
