@@ -145,6 +145,9 @@ abstract class Operation implements XdrEncodableInterface
             case Operation::TYPE_ACCOUNT_MERGE:
                 $model = AccountMergeOp::fromXdr($xdr);
                 break;
+            case Operation::TYPE_INFLATION:
+                $model = new InflationOp(); // no additional XDR to parse
+                break;
             default:
                 throw new \InvalidArgumentException(sprintf('unrecognized operation type %s', $type));
         }
