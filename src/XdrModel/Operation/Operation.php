@@ -124,6 +124,9 @@ abstract class Operation implements XdrEncodableInterface
             case Operation::TYPE_PAYMENT:
                 $model = PaymentOp::fromXdr($xdr);
                 break;
+            case Operation::TYPE_PATH_PAYMENT:
+                $model = PathPaymentOp::fromXdr($xdr);
+                break;
             case Operation::TYPE_ACCOUNT_MERGE:
                 $model = AccountMergeOp::fromXdr($xdr);
                 break;

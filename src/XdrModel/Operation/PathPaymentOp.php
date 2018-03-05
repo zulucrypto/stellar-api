@@ -8,6 +8,7 @@ use phpseclib\Math\BigInteger;
 use ZuluCrypto\StellarSdk\Keypair;
 use ZuluCrypto\StellarSdk\Model\StellarAmount;
 use ZuluCrypto\StellarSdk\Xdr\Type\VariableArray;
+use ZuluCrypto\StellarSdk\Xdr\XdrBuffer;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 use ZuluCrypto\StellarSdk\XdrModel\AccountId;
 use ZuluCrypto\StellarSdk\XdrModel\Asset;
@@ -109,6 +110,30 @@ class PathPaymentOp extends Operation
         $bytes .= $this->paths->toXdr();
 
         return $bytes;
+    }
+
+    /**
+     * @deprecated Do not call this directly, instead call Operation::fromXdr()
+     * @param XdrBuffer $xdr
+     * @return Operation|PathPaymentOp
+     * @throws \ErrorException
+     */
+    public static function fromXdr(XdrBuffer $xdr)
+    {
+        $sendingAsset = Asset::fromXdr($xdr);
+        $sendMax = StellarAmount::fromXdr($xdr);
+        $destinationAccount = AccountId::fromXdr($xdr);
+        $destinationAsset = Asset::fromXdr($xdr);
+        $destinationAmount = StellarAmount::fromXdr($xdr);
+
+        $model = new PathPaymentOp($sendingAsset, $sendMax->getUnscaledBigInteger(), $destinationAccount->getAccountIdString(), $destinationAsset, $destinationAmount->getUnscaledBigInteger());
+
+        $numPaths = $xdr->readUnsignedInteger();
+        for ($i=0; $i < $numPaths; $i++) {
+            $model->paths->append(Asset::fromXdr($xdr));
+        }
+
+        return $model;
     }
 
     /**
