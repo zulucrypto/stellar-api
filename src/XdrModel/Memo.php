@@ -4,6 +4,7 @@ namespace ZuluCrypto\StellarSdk\XdrModel;
 
 
 use ZuluCrypto\StellarSdk\Util\Debug;
+use ZuluCrypto\StellarSdk\Xdr\XdrBuffer;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 
 /**
@@ -16,8 +17,6 @@ use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
  *      id: uint64
  *      hash: Hash
  *      return: Hash
- *
- * todo: implement the rest of the types
  */
 class Memo
 {
@@ -96,5 +95,46 @@ class Memo
         }
 
         return $bytes;
+    }
+
+    /**
+     * @param XdrBuffer $xdr
+     * @return Memo
+     * @throws \ErrorException
+     */
+    public static function fromXdr(XdrBuffer $xdr)
+    {
+        $type = $xdr->readUnsignedInteger();
+
+        $memo = new Memo($type);
+
+        if ($memo->type == static::MEMO_TYPE_TEXT) {
+            $memo->value = $xdr->readString(static::VALUE_TEXT_MAX_SIZE);
+        }
+        if ($memo->type == static::MEMO_TYPE_ID) {
+            $memo->value = $xdr->readBigInteger()->toString();
+        }
+        if ($memo->type == static::MEMO_TYPE_HASH
+        || $memo->type == static::MEMO_TYPE_RETURN) {
+            $memo->value = $xdr->readOpaqueFixed(32);
+        }
+
+        return $memo;
+    }
+
+    /**
+     * @return int
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @return string
+     */
+    public function getValue()
+    {
+        return $this->value;
     }
 }
