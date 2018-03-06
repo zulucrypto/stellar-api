@@ -3,6 +3,8 @@
 
 namespace ZuluCrypto\StellarSdk\Xdr;
 
+use phpseclib\Math\BigInteger;
+
 
 /**
  * Enables easy iteration through a blob of XDR data
@@ -57,6 +59,21 @@ class XdrBuffer
         $this->position += $dataSize;
 
         return $data;
+    }
+
+    /**
+     * @return BigInteger
+     * @throws \ErrorException
+     */
+    public function readBigInteger()
+    {
+        $dataSize = 8;
+        $this->assertBytesRemaining($dataSize);
+
+        $bigInteger = new BigInteger(substr($this->xdrBytes, $this->position, $dataSize), 256);
+        $this->position += $dataSize;
+
+        return $bigInteger;
     }
 
     /**
