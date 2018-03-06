@@ -193,8 +193,9 @@ class XdrBuffer
      */
     protected function roundTo4($number)
     {
-        $remainder = floor($number / 4);
+        $remainder = $number % 4;
+        if (!$remainder) return $number;
 
-        return $number + $remainder;
+        return $number + (4 - $remainder);
     }
 }
