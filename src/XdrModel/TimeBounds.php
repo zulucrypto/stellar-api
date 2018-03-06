@@ -61,13 +61,6 @@ class TimeBounds
     {
         $bytes = '';
 
-        // Special case: this is an optional union so if both values are null
-        // consider it empty
-        if ($this->minTime === null && $this->maxTime === null) {
-            return XdrEncoder::boolean(false);
-        }
-
-        $bytes .= XdrEncoder::boolean(true);
         $bytes .= XdrEncoder::unsignedInteger64($this->minTime);
         $bytes .= XdrEncoder::unsignedInteger64($this->maxTime);
 
@@ -81,14 +74,19 @@ class TimeBounds
      */
     public static function fromXdr(XdrBuffer $xdr)
     {
-        // This is an optional field, so return null if the boolean value is 0
-        if (!$xdr->readBoolean()) return null;
-
         $model = new TimeBounds();
         $model->minTime = $xdr->readUnsignedInteger64();
         $model->maxTime = $xdr->readUnsignedInteger64();
 
         return $model;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        return $this->minTime === null && $this->maxTime === null;
     }
 
     /**

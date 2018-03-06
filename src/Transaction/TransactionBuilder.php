@@ -382,8 +382,16 @@ class TransactionBuilder implements XdrEncodableInterface
         $bytes .= XdrEncoder::unsignedInteger($this->getFee());
         // Sequence number (8 bytes)
         $bytes .= XdrEncoder::unsignedInteger64($sequenceNumber);
-        // Time Bounds (4 bytes if empty, 20 bytes if set)
-        $bytes .= $this->timeBounds->toXdr();
+
+        // Time Bounds are optional
+        if ($this->timeBounds->isEmpty()) {
+            $bytes .= XdrEncoder::boolean(false);
+        }
+        else {
+            $bytes .= XdrEncoder::boolean(true);
+            $bytes .= $this->timeBounds->toXdr();
+        }
+
         // Memo (4 bytes if empty, 36 bytes maximum)
         $bytes .= $this->memo->toXdr();
 
