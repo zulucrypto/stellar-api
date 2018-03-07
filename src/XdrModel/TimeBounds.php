@@ -75,8 +75,8 @@ class TimeBounds
     public static function fromXdr(XdrBuffer $xdr)
     {
         $model = new TimeBounds();
-        $model->minTime = $xdr->readUnsignedInteger64();
-        $model->maxTime = $xdr->readUnsignedInteger64();
+        $model->minTime = \DateTime::createFromFormat('U', $xdr->readUnsignedInteger64());
+        $model->maxTime = \DateTime::createFromFormat('U', $xdr->readUnsignedInteger64());
 
         return $model;
     }
