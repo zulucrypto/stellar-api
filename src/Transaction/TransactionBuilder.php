@@ -10,6 +10,7 @@ use ZuluCrypto\StellarSdk\Horizon\Exception\HorizonException;
 use ZuluCrypto\StellarSdk\Horizon\Exception\PostTransactionException;
 use ZuluCrypto\StellarSdk\Keypair;
 use ZuluCrypto\StellarSdk\Model\StellarAmount;
+use ZuluCrypto\StellarSdk\Server;
 use ZuluCrypto\StellarSdk\Signing\PrivateKeySigner;
 use ZuluCrypto\StellarSdk\Signing\SigningInterface;
 use ZuluCrypto\StellarSdk\Util\MathSafety;
@@ -402,6 +403,17 @@ class TransactionBuilder implements XdrEncodableInterface
         $bytes .= XdrEncoder::unsignedInteger(0);
 
         return $bytes;
+    }
+
+    /**
+     * @param XdrBuffer $xdr
+     * @param Server    $server
+     * @return TransactionBuilder
+     * @throws \ErrorException
+     */
+    public static function fromXdr(XdrBuffer $xdr, Server $server)
+    {
+        return Transaction::fromXdr($xdr)->toTransactionBuilder($server);
     }
 
     /**
