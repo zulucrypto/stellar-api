@@ -5,6 +5,7 @@ namespace ZuluCrypto\StellarSdk\XdrModel;
 
 
 use ZuluCrypto\StellarSdk\Keypair;
+use ZuluCrypto\StellarSdk\Server;
 use ZuluCrypto\StellarSdk\Transaction\TransactionBuilder;
 use ZuluCrypto\StellarSdk\Util\Debug;
 use ZuluCrypto\StellarSdk\Util\Hash;
@@ -72,13 +73,19 @@ class TransactionEnvelope implements XdrEncodableInterface
      * @param Keypair[]|string[] $keypairsOrsecretKeyStrings
      * @return $this
      */
-    public function sign($keypairsOrsecretKeyStrings)
+    public function sign($keypairsOrsecretKeyStrings, Server $server = null)
     {
         if (!is_array($keypairsOrsecretKeyStrings)) $keypairsOrsecretKeyStrings = [$keypairsOrsecretKeyStrings];
 
-        foreach ($keypairsOrsecretKeyStrings as $keypairOrSecretKeyString) {
+        $transactionHash = null;
+        if ($server) {
+            $transactionHash = $server->getApiClient()->hash($this->transactionBuilder);
+        }
+        else {
             $transactionHash = $this->transactionBuilder->hash();
+        }
 
+        foreach ($keypairsOrsecretKeyStrings as $keypairOrSecretKeyString) {
             if (is_string($keypairOrSecretKeyString)) {
                 $keypairOrSecretKeyString = Keypair::newFromSeed($keypairOrSecretKeyString);
             }
@@ -104,5 +111,13 @@ class TransactionEnvelope implements XdrEncodableInterface
     public function addDecoratedSignature(DecoratedSignature $decoratedSignature)
     {
         $this->signatures->append($decoratedSignature);
+    }
+
+    /**
+     * @return DecoratedSignature[]
+     */
+    public function getDecoratedSignatures()
+    {
+        return $this->signatures->toArray();
     }
 }
