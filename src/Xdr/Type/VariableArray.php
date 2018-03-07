@@ -49,4 +49,11 @@ class VariableArray implements XdrEncodableInterface
         return count($this->elements);
     }
 
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return array_values($this->elements);
+    }
 }
