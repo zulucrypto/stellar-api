@@ -201,4 +201,20 @@ class Server
     {
         $this->signingProvider = $signingProvider;
     }
+
+    /**
+     * @return ApiClient
+     */
+    public function getApiClient()
+    {
+        return $this->apiClient;
+    }
+
+    /**
+     * @param ApiClient $apiClient
+     */
+    public function setApiClient($apiClient)
+    {
+        $this->apiClient = $apiClient;
+    }
 }
