@@ -5,6 +5,7 @@ namespace ZuluCrypto\StellarSdk\Transaction;
 
 use phpseclib\Math\BigInteger;
 use ZuluCrypto\StellarSdk\Model\StellarAmount;
+use ZuluCrypto\StellarSdk\Server;
 use ZuluCrypto\StellarSdk\Xdr\XdrBuffer;
 use ZuluCrypto\StellarSdk\XdrModel\AccountId;
 use ZuluCrypto\StellarSdk\XdrModel\Memo;
@@ -77,6 +78,40 @@ class Transaction
         $xdr->readOpaqueFixed(4);
 
         return $tx;
+    }
+
+    public function __construct()
+    {
+        $this->timeBounds = new TimeBounds();
+    }
+
+    /**
+     * @param Server $server
+     * @return TransactionBuilder
+     */
+    public function toTransactionBuilder(Server $server = null)
+    {
+        $builder = new TransactionBuilder($this->sourceAccountId->getAccountIdString());
+
+        if ($server) {
+            $builder->setApiClient($server->getApiClient());
+        }
+
+
+        $builder->setSequenceNumber($this->sequenceNumber);
+
+        if (!$this->timeBounds->isEmpty()) {
+            $builder->setLowerTimebound($this->timeBounds->getMinTime());
+            $builder->setUpperTimebound($this->timeBounds->getMaxTime());
+        }
+
+        $builder->setMemo($this->memo);
+
+        foreach ($this->operations as $operation) {
+            $builder->addOperation($operation);
+        }
+
+        return $builder;
     }
 
     /**
