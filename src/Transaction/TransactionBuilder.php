@@ -564,4 +564,20 @@ class TransactionBuilder implements XdrEncodableInterface
 
         return $this;
     }
+
+    /**
+     * @return Memo
+     */
+    public function getMemo()
+    {
+        return $this->memo;
+    }
+
+    /**
+     * @param Memo $memo
+     */
+    public function setMemo($memo)
+    {
+        $this->memo = $memo;
+    }
 }
