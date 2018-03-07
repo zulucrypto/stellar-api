@@ -6,11 +6,13 @@ namespace ZuluCrypto\StellarSdk\XdrModel;
 
 use ZuluCrypto\StellarSdk\Keypair;
 use ZuluCrypto\StellarSdk\Server;
+use ZuluCrypto\StellarSdk\Transaction\Transaction;
 use ZuluCrypto\StellarSdk\Transaction\TransactionBuilder;
 use ZuluCrypto\StellarSdk\Util\Debug;
 use ZuluCrypto\StellarSdk\Util\Hash;
 use ZuluCrypto\StellarSdk\Xdr\Iface\XdrEncodableInterface;
 use ZuluCrypto\StellarSdk\Xdr\Type\VariableArray;
+use ZuluCrypto\StellarSdk\Xdr\XdrBuffer;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 
 class TransactionEnvelope implements XdrEncodableInterface
@@ -45,6 +47,25 @@ class TransactionEnvelope implements XdrEncodableInterface
         $bytes .= $this->signatures->toXdr();
 
         return $bytes;
+    }
+
+    /**
+     * @param XdrBuffer $xdr
+     * @return TransactionEnvelope
+     * @throws \ErrorException
+     */
+    public static function fromXdr(XdrBuffer $xdr)
+    {
+        $builder = Transaction::fromXdr($xdr)->toTransactionBuilder();
+
+        $model = new TransactionEnvelope($builder);
+
+        $numSignatures = $xdr->readUnsignedInteger();
+        for ($i=0; $i < $numSignatures; $i++) {
+            $model->signatures->append(DecoratedSignature::fromXdr($xdr));
+        }
+
+        return $model;
     }
 
     /**
