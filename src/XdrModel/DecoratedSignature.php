@@ -5,6 +5,7 @@ namespace ZuluCrypto\StellarSdk\XdrModel;
 
 
 use ZuluCrypto\StellarSdk\Xdr\Iface\XdrEncodableInterface;
+use ZuluCrypto\StellarSdk\Xdr\XdrBuffer;
 use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 
 class DecoratedSignature implements XdrEncodableInterface
@@ -33,6 +34,19 @@ class DecoratedSignature implements XdrEncodableInterface
         $bytes .= XdrEncoder::opaqueVariable($this->signature);
 
         return $bytes;
+    }
+
+    /**
+     * @param XdrBuffer $xdr
+     * @return DecoratedSignature
+     * @throws \ErrorException
+     */
+    public static function fromXdr(XdrBuffer $xdr)
+    {
+        $hint = $xdr->readOpaqueFixed(4);
+        $signature = $xdr->readOpaqueVariable();
+
+        return new DecoratedSignature($hint, $signature);
     }
 
     /**
