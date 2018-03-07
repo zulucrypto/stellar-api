@@ -19,21 +19,21 @@ use ZuluCrypto\StellarSdk\Xdr\XdrEncoder;
 class TimeBounds
 {
     /**
-     * @var int 64-bit unsigned
+     * @var \DateTime
      */
     private $minTime;
 
     /**
-     * @var int 64-bit unsigned
+     * @var \DateTime
      */
     private $maxTime;
 
     /**
-     * @param null|number $minTime 64-bit unix timestamp
-     * @param null|number $maxTime 64-bit unix timestamp
+     * @param \DateTime|null $minTime
+     * @param \DateTime|null $maxTime
      * @throws \ErrorException
      */
-    public function __construct($minTime = null, $maxTime = null)
+    public function __construct(\DateTime $minTime = null, \DateTime $maxTime = null)
     {
         MathSafety::require64Bit();
 
@@ -46,7 +46,7 @@ class TimeBounds
      */
     public function setMinTime(\DateTime $min)
     {
-        $this->minTime = $min->format('U');
+        $this->minTime = clone $min;
     }
 
     /**
@@ -54,15 +54,15 @@ class TimeBounds
      */
     public function setMaxTime(\DateTime $max)
     {
-        $this->maxTime = $max->format('U');
+        $this->maxTime = clone $max;
     }
 
     public function toXdr()
     {
         $bytes = '';
 
-        $bytes .= XdrEncoder::unsignedInteger64($this->minTime);
-        $bytes .= XdrEncoder::unsignedInteger64($this->maxTime);
+        $bytes .= XdrEncoder::unsignedInteger64($this->getMinTimestamp());
+        $bytes .= XdrEncoder::unsignedInteger64($this->getMaxTimestamp());
 
         return $bytes;
     }
@@ -90,11 +90,27 @@ class TimeBounds
     }
 
     /**
+     * @return \DateTime
+     */
+    public function getMinTime()
+    {
+        return $this->minTime;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getMaxTime()
+    {
+        return $this->maxTime;
+    }
+
+    /**
      * @return int
      */
     public function getMinTimestamp()
     {
-        return $this->minTime;
+        return $this->minTime->format('U');
     }
 
     /**
@@ -102,6 +118,6 @@ class TimeBounds
      */
     public function getMaxTimestamp()
     {
-        return $this->maxTime;
+        return $this->maxTime->format('U');
     }
 }

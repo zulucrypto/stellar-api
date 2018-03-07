@@ -12,7 +12,7 @@ class TimeBoundsTest extends TestCase
 {
     public function testTimeBoundsFromXdr()
     {
-        $source = new TimeBounds(1000, 2000);
+        $source = new TimeBounds(new \DateTime('2018-01-01 00:00:00'), new \DateTime('2018-01-31 00:00:00'));
 
         $decoded = TimeBounds::fromXdr(new XdrBuffer($source->toXdr()));
 
