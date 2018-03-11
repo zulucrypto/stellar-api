@@ -1,3 +1,20 @@
+### 0.6.0
+
+Initial support for parsing binary XDR into PHP objects.
+
+See examples/transaction-add-signature.php
+
+To sign existing XDR:
+
+```php
+$server = Server::testNet();
+
+$transactionEnvelope = TransactionEnvelope::fromXdr(new XdrBuffer($xdr));
+$transactionEnvelope->sign($keypair, $server);
+
+$server->submitB64Transaction($transactionEnvelope->toBase64());
+```
+
 ### 0.5.0
 
 This release adds parsing of the Transaction response so you can get detailed information
