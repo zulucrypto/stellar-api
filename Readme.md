@@ -13,7 +13,7 @@ This library is under active development and should be considered beta quality.
 Please ensure that you've tested extensively on a test network and have added
 sanity checks in other places in your code.
 
-:warning: [See the 0.2.0 release notes for breaking changes](CHANGELOG.md) 
+:warning: [See the release notes for breaking changes](CHANGELOG.md) 
 
 **Large Integer Support**
 
