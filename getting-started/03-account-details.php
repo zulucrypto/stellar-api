@@ -17,7 +17,7 @@ foreach ($account->getBalances() as $balance) {
     printf('  Type: %s, Code: %s, Balance: %s' . PHP_EOL,
         $balance->getAssetType(),
         $balance->getAssetCode(),
-        $balance->getBalanceString()
+        $balance->getBalance()
     );
 }
 
