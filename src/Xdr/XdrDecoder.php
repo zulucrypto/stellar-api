@@ -26,7 +26,8 @@ class XdrDecoder
     public static function unsignedInteger($xdr)
     {
         // unsigned 32-bit big-endian
-        return array_pop(unpack('N', $xdr));
+        $unpacked = unpack('N', $xdr);
+        return array_pop($unpacked);
     }
 
     /**
@@ -37,7 +38,13 @@ class XdrDecoder
     {
         // pack() does not support a signed 32-byte int, so work around this with
         // custom encoding
-        return (self::nativeIsBigEndian()) ? array_pop(unpack('l', $xdr)) : array_pop(unpack('l', strrev($xdr)));
+        if (!self::nativeIsBigEndian()) {
+            $xdr = strrev($xdr);
+        }
+
+        $unpacked = unpack('l', $xdr);
+
+        return array_pop($unpacked);
     }
 
     /**
@@ -50,7 +57,8 @@ class XdrDecoder
         MathSafety::require64Bit();
 
         // unsigned 64-bit big-endian
-        return array_pop(unpack('J', $xdr));
+        $unpacked = unpack('J', $xdr);
+        return array_pop($unpacked);
     }
 
     /**
@@ -74,7 +82,13 @@ class XdrDecoder
 
         // pack() does not support a signed 64-byte int, so work around this with
         // custom encoding
-        return (self::nativeIsBigEndian()) ? array_pop(unpack('q', $xdr)) : array_pop(unpack('q', strrev($xdr)));
+        if (!self::nativeIsBigEndian()) {
+            $xdr = strrev($xdr);
+        }
+
+        $unpacked = unpack('q', $xdr);
+
+        return array_pop($unpacked);
     }
 
     /**
