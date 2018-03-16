@@ -1,3 +1,7 @@
+### 0.6.1
+
+Fix "Only variables should be passed by reference" notice in several XdrDecoder / XdrEncoder methods (thanks @natrod)
+
 ### 0.6.0
 
 Initial support for parsing binary XDR into PHP objects.
