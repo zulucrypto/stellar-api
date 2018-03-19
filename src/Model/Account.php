@@ -333,6 +333,16 @@ class Account extends RestApiModel
 
         return null;
     }
+    
+    /**
+     * Returns an array holding account thresholds.
+     * 
+     * @return array
+     */
+    public function getThresholds()
+    {
+        return $this->thresholds;
+    }
 
     public function getSequence()
     {
