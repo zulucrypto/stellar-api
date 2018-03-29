@@ -32,6 +32,24 @@ class XdrEncoderTest extends TestCase
         $this->assertBytesEqual('80 00 00 00 00 00 00 00', XdrEncoder::signedBigInteger64(new BigInteger("-9223372036854775808")));
     }
 
+    public function testUnsignedBigInteger64()
+    {
+        // 100
+        $this->assertBytesEqual('00 00 00 00 00 00 00 64', XdrEncoder::unsignedBigInteger64(new BigInteger("100")));
+
+        // 18446744073709551615
+        $this->assertBytesEqual('ff ff ff ff ff ff ff ff', XdrEncoder::unsignedBigInteger64(new BigInteger("18446744073709551615")));
+
+        // MAX_INT
+        $this->assertBytesEqual('00 00 00 00 ff ff ff ff', XdrEncoder::unsignedBigInteger64(new BigInteger("4294967295")));
+
+        // MAX_INT + 1
+        $this->assertBytesEqual('00 00 00 01 00 00 00 00', XdrEncoder::unsignedBigInteger64(new BigInteger("4294967296")));
+
+        // max positive signed int64
+        $this->assertBytesEqual('7f ff ff ff ff ff ff ff', XdrEncoder::unsignedBigInteger64(new BigInteger("9223372036854775807")));
+    }
+
     public function testOpaqueVariable()
     {
         // Test padding is applied when characters are not a multiple of 4
