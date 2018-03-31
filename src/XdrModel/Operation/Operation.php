@@ -43,6 +43,7 @@ abstract class Operation implements XdrEncodableInterface
     const TYPE_ACCOUNT_MERGE        = 8;
     const TYPE_INFLATION            = 9;
     const TYPE_MANAGE_DATA          = 10;
+    const TYPE_BUMP_SEQUENCE        = 11;
 
     /**
      * @var AccountId
@@ -150,6 +151,9 @@ abstract class Operation implements XdrEncodableInterface
                 break;
             case Operation::TYPE_MANAGE_DATA:
                 $model = ManageDataOp::fromXdr($xdr);
+                break;
+            case Operation::TYPE_BUMP_SEQUENCE:
+                $model = BumpSequenceOp::fromXdr($xdr);
                 break;
             default:
                 throw new \InvalidArgumentException(sprintf('unrecognized operation type %s', $type));
