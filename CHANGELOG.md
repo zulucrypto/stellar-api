@@ -1,3 +1,7 @@
+### 0.6.2
+
+Use `empty()` instead of `count()` for checking if `operationResultCodes` are present (thanks @omarfurrer)
+
 ### 0.6.1
 
 Fix "Only variables should be passed by reference" notice in several XdrDecoder / XdrEncoder methods (thanks @natrod)
