@@ -142,7 +142,7 @@ class HorizonException extends \ErrorException
         if ($this->transactionResultCode) {
             $message .= sprintf(" Tx Result: %s", $this->transactionResultCode);
         }
-        if (count($this->operationResultCodes) > 0) {
+        if (!empty($this->operationResultCodes)) {
             $message .= sprintf(" Op Results: %s", print_r($this->operationResultCodes,true));
         }
 
