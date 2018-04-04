@@ -52,9 +52,11 @@ class TrezorSigner implements SigningInterface
 
         $networkPassphrase = $builder->getApiClient()->getNetworkPassphrase();
 
-        $cmd = sprintf('%s stellar_sign_transaction -a %s -n %s %s',
+        $bip32Path = sprintf("m/44'/148'/%s'", $this->accountIndex);
+
+        $cmd = sprintf('%s stellar_sign_transaction --address %s -n %s %s',
             $this->trezorBinPath,
-            escapeshellarg(($this->accountIndex + 1)),
+            escapeshellarg($bip32Path),
             escapeshellarg($networkPassphrase),
             escapeshellarg(base64_encode($xdr))
         );
