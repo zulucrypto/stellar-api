@@ -1,3 +1,9 @@
+### 0.6.3
+
+Added support for [BumpSequenceOp](https://github.com/stellar/stellar-protocol/issues/53)
+
+Note that this is for forward compatibility. This operation is not yet available in the Stellar test or production networks.
+
 ### 0.6.2
 
 Use `empty()` instead of `count()` for checking if `operationResultCodes` are present (thanks @omarfurrer)
