@@ -24,6 +24,7 @@ use ZuluCrypto\StellarSdk\XdrModel\DecoratedSignature;
 use ZuluCrypto\StellarSdk\XdrModel\Memo;
 use ZuluCrypto\StellarSdk\XdrModel\Operation\AccountMergeOp;
 use ZuluCrypto\StellarSdk\XdrModel\Operation\AllowTrustOp;
+use ZuluCrypto\StellarSdk\XdrModel\Operation\BumpSequenceOp;
 use ZuluCrypto\StellarSdk\XdrModel\Operation\ChangeTrustOp;
 use ZuluCrypto\StellarSdk\XdrModel\Operation\CreateAccountOp;
 use ZuluCrypto\StellarSdk\XdrModel\Operation\ManageDataOp;
@@ -360,6 +361,16 @@ class TransactionBuilder implements XdrEncodableInterface
     public function clearAccountData($key, $sourceAccountId = null)
     {
         return $this->addOperation(new ManageDataOp($key, null, $sourceAccountId));
+    }
+
+    /**
+     * @param BigInteger $bumpTo
+     * @param null       $sourceAccountId
+     * @return TransactionBuilder
+     */
+    public function bumpSequenceTo(BigInteger $bumpTo, $sourceAccountId = null)
+    {
+        return $this->addOperation(new BumpSequenceOp($bumpTo, $sourceAccountId));
     }
 
     /**
