@@ -45,7 +45,14 @@ abstract class HardwareWalletIntegrationTest extends IntegrationTest
 
         // GDRXE2BQUC3AZNPVFSCEZ76NJ3WWL25FYFK6RGZGIEKWE4SOOHSUJUJ6
         // SBGWSG6BTNCKCOB3DIFBGCVMUPQFYPA2G4O34RMTB343OYPXU5DJDVMN
-        $this->mnemonic = 'illness spike retreat truth genius clock brain pass fit cave bargain toe';
+        //$this->mnemonic = 'illness spike retreat truth genius clock brain pass fit cave bargain toe';
+
+        // Mnemonic to match trezor-python test suite
+        // GAK5MSF74TJW6GLM7NLTL76YZJKM2S4CGP3UH4REJHPHZ4YBZW2GSBPW
+        // SDE2YU4V2IYSJIUH7MONDYZTSSLDXV5QDEGUUOLCU4TK7CZWTAXZ5CEG
+        $this->mnemonic = 'alcohol woman abuse must during monitor noble actual mixed trade anger aisle';
+
+
         $this->privateKeySigner = new PrivateKeySigner(Keypair::newFromMnemonic($this->mnemonic));
     }
 

@@ -121,6 +121,36 @@ class XdrEncoder
     }
 
     /**
+     * Converts $value to an unsigned 8-byte big endian uint64
+     *
+     * @param BigInteger $value
+     * @return string
+     */
+    public static function unsignedBigInteger64(BigInteger $value)
+    {
+        $xdrBytes = '';
+        $bigIntBytes = $value->toBytes(true);
+
+        // Special case: MAX_UINT_64 will look like 00ffffffffffffffff and have an
+        // extra preceeding byte we need to get rid of
+        if (strlen($bigIntBytes) === 9 && substr($value->toHex(true), 0, 2) === '00') {
+            $bigIntBytes = substr($bigIntBytes, 1);
+        }
+
+        $paddingChar = chr(0);
+
+        $paddingBytes = 8 - strlen($bigIntBytes);
+        while ($paddingBytes > 0) {
+            $xdrBytes .= $paddingChar;
+            $paddingBytes--;
+        }
+
+        $xdrBytes .= $bigIntBytes;
+
+        return XdrEncoder::opaqueFixed($xdrBytes, 8);
+    }
+
+    /**
      * Use this to write raw bytes representing a 64-bit integer
      *
      * This value will be padded up to 8 bytes
