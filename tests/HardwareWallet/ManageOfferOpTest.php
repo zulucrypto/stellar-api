@@ -38,6 +38,9 @@ class ManageOfferOpTest extends HardwareWalletIntegrationTest
             '      Source: ' . $sourceKeypair->getPublicKey(),
             '     Selling: ' . $amount . 'XLM',
             '      Buying: ' . 'For ' . $price . ' per ' . $buyingAsset->getAssetCode() . ' (' . $buyingAsset->getIssuer()->getAccountIdString() . ')',
+            '',
+            'B64 Transaction: ' . base64_encode($transaction->toXdr()),
+            '      Signature: ' . $knownSignature->getWithoutHintBase64(),
         ]));
         $hardwareSignature = $transaction->signWith($this->horizonServer->getSigningProvider());
 

@@ -35,6 +35,9 @@ class SetOptionsOpTest extends HardwareWalletIntegrationTest
             '      Set Option: inflation destination',
             '          Source: ' . $sourceKeypair->getPublicKey(),
             'Inf. Destination: ' . $inflationDestination->getPublicKey(),
+            '',
+            'B64 Transaction: ' . base64_encode($transaction->toXdr()),
+            '      Signature: ' . $knownSignature->getWithoutHintBase64(),
         ]));
         $hardwareSignature = $transaction->signWith($this->horizonServer->getSigningProvider());
 

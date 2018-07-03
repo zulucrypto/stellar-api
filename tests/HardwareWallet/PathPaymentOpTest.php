@@ -15,7 +15,7 @@ class PathPaymentOpTest extends HardwareWalletIntegrationTest
     /**
      * @group requires-hardwarewallet
      */
-    public function testNativeAssetPaymentNoPaths()
+    public function testNativeAssetPathPaymentNoPaths()
     {
         $sourceKeypair = Keypair::newFromMnemonic($this->mnemonic);
         $destKeypair = Keypair::newFromMnemonic($this->mnemonic, 'destination');
@@ -46,6 +46,9 @@ class PathPaymentOpTest extends HardwareWalletIntegrationTest
             '       Max Paid: ' . $maxAmount . ' XLM',
             'Amount Received: ' . sprintf('%s %s (%s)', $receivesAmount, $receiverGetsAsset->getAssetCode(), $receiverGetsAsset->getIssuer()->getAccountIdString()),
             '             To: ' . $destKeypair->getPublicKey(),
+            '',
+            'B64 Transaction: ' . base64_encode($transaction->toXdr()),
+            '      Signature: ' . $knownSignature->getWithoutHintBase64(),
         ]));
         $hardwareSignature = $transaction->signWith($this->horizonServer->getSigningProvider());
 
@@ -55,7 +58,7 @@ class PathPaymentOpTest extends HardwareWalletIntegrationTest
     /**
      * @group requires-hardwarewallet
      */
-    public function testNativeAssetPaymentOnePath()
+    public function testNativeAssetPathPaymentOnePath()
     {
         $sourceKeypair = Keypair::newFromMnemonic($this->mnemonic);
         $destKeypair = Keypair::newFromMnemonic($this->mnemonic, 'destination');
@@ -90,6 +93,10 @@ class PathPaymentOpTest extends HardwareWalletIntegrationTest
             '       Max Paid: ' . $maxAmount . ' XLM',
             'Amount Received: ' . sprintf('%s %s (%s)', $receivesAmount, $receiverGetsAsset->getAssetCode(), $receiverGetsAsset->getIssuer()->getAccountIdString()),
             '             To: ' . $destKeypair->getPublicKey(),
+            '         Path 1: ' . sprintf('%s (%s)', $pathAsset1->getAssetCode(), $pathAsset1->getIssuer()->getAccountIdString()),
+            '',
+            'B64 Transaction: ' . base64_encode($transaction->toXdr()),
+            '      Signature: ' . $knownSignature->getWithoutHintBase64(),
         ]));
         $hardwareSignature = $transaction->signWith($this->horizonServer->getSigningProvider());
 

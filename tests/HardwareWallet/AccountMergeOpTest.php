@@ -28,6 +28,9 @@ class AccountMergeOpTest extends HardwareWalletIntegrationTest
             'Merge Account: ',
             '       Source: ' . $sourceKeypair->getPublicKey(),
             '  Destination: ' . $destinationKeypair->getPublicKey(),
+            '',
+            'B64 Transaction: ' . base64_encode($transaction->toXdr()),
+            '      Signature: ' . $knownSignature->getWithoutHintBase64(),
         ]));
         $hardwareSignature = $transaction->signWith($this->horizonServer->getSigningProvider());
 

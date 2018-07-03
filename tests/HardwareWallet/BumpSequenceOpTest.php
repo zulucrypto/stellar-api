@@ -30,6 +30,9 @@ class BumpSequenceOpTest extends HardwareWalletIntegrationTest
             '  Bump Sequence: basic',
             '         Source: ' . $sourceKeypair->getPublicKey(),
             '        Bump To: ' . $bumpTo->toString(),
+            '',
+            'B64 Transaction: ' . base64_encode($transaction->toXdr()),
+            '      Signature: ' . $knownSignature->getWithoutHintBase64(),
         ]));
         $hardwareSignature = $transaction->signWith($this->horizonServer->getSigningProvider());
 

@@ -32,6 +32,9 @@ class ChangeTrustOpTest extends HardwareWalletIntegrationTest
             '        Code: ' . $asset->getAssetCode(),
             '      Amount: ' . 'Maximum',
             '      Issuer: ' . $asset->getIssuer()->getAccountIdString(),
+            '',
+            'B64 Transaction: ' . base64_encode($transaction->toXdr()),
+            '      Signature: ' . $knownSignature->getWithoutHintBase64(),
         ]));
         $hardwareSignature = $transaction->signWith($this->horizonServer->getSigningProvider());
 
@@ -58,6 +61,9 @@ class ChangeTrustOpTest extends HardwareWalletIntegrationTest
             '        Code: ' . $asset->getAssetCode(),
             '      Amount: ' . '1000',
             '      Issuer: ' . $asset->getIssuer()->getAccountIdString(),
+            '',
+            'B64 Transaction: ' . base64_encode($transaction->toXdr()),
+            '      Signature: ' . $knownSignature->getWithoutHintBase64(),
         ]));
         $hardwareSignature = $transaction->signWith($this->horizonServer->getSigningProvider());
 

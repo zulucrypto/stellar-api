@@ -29,6 +29,9 @@ class CreateAccountOpTest extends HardwareWalletIntegrationTest
             '          Source: ' . $sourceKeypair->getPublicKey(),
             'Creating account: ' . $newKeypair->getPublicKey(),
             ' Initial balance: ' . 100.0333,
+            '',
+            ' B64 Transaction: ' . base64_encode($transaction->toXdr()),
+            '       Signature: ' . $knownSignature->getWithoutHintBase64(),
         ]));
         $hardwareSignature = $transaction->signWith($this->horizonServer->getSigningProvider());
 

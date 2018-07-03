@@ -31,6 +31,9 @@ class PaymentOpTest extends HardwareWalletIntegrationTest
             'Source: ' . $sourceKeypair->getPublicKey(),
             '   Pay: ' . $amount . ' XLM',
             '    To: ' . $destKeypair->getPublicKey(),
+            '',
+            ' B64 Transaction: ' . base64_encode($transaction->toXdr()),
+            '       Signature: ' . $knownSignature->getWithoutHintBase64(),
         ]));
         $hardwareSignature = $transaction->signWith($this->horizonServer->getSigningProvider());
 
@@ -91,6 +94,9 @@ class PaymentOpTest extends HardwareWalletIntegrationTest
             'Source: ' . $sourceKeypair->getPublicKey(),
             '   Pay: ' . sprintf('%s %s (%s)', $amount, $asset->getAssetCode(), $asset->getIssuer()->getAccountIdString()),
             '    To: ' . $destKeypair->getPublicKey(),
+            '',
+            ' B64 Transaction: ' . base64_encode($transaction->toXdr()),
+            '       Signature: ' . $knownSignature->getWithoutHintBase64(),
         ]));
         $hardwareSignature = $transaction->signWith($this->horizonServer->getSigningProvider());
 
@@ -121,6 +127,9 @@ class PaymentOpTest extends HardwareWalletIntegrationTest
             'Source: ' . $sourceKeypair->getPublicKey(),
             '   Pay: ' . sprintf('%s %s (%s)', $amount, $asset->getAssetCode(), $asset->getIssuer()->getAccountIdString()),
             '    To: ' . $destKeypair->getPublicKey(),
+            '',
+            ' B64 Transaction: ' . base64_encode($transaction->toXdr()),
+            '       Signature: ' . $knownSignature->getWithoutHintBase64(),
         ]));
         $hardwareSignature = $transaction->signWith($this->horizonServer->getSigningProvider());
 

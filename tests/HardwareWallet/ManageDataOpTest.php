@@ -32,6 +32,9 @@ class ManageDataOpTest extends HardwareWalletIntegrationTest
             '     Source: ' . $sourceKeypair->getPublicKey(),
             '        Key: ' . $dataKey,
             ' Value Hash: ' . hash('sha256', $dataValue),
+            '',
+            'B64 Transaction: ' . base64_encode($transaction->toXdr()),
+            '      Signature: ' . $knownSignature->getWithoutHintBase64(),
         ]));
         $hardwareSignature = $transaction->signWith($this->horizonServer->getSigningProvider());
 

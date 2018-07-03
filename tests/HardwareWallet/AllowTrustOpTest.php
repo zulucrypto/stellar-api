@@ -32,6 +32,9 @@ class AllowTrustOpTest extends HardwareWalletIntegrationTest
             '         Source: ' . $sourceKeypair->getPublicKey(),
             '          Asset: ' . $asset->getAssetCode(),
             'Trusted Account: ' . $trustedKeypair->getPublicKey(),
+            '',
+            'B64 Transaction: ' . base64_encode($transaction->toXdr()),
+            '      Signature: ' . $knownSignature->getWithoutHintBase64(),
         ]));
         $hardwareSignature = $transaction->signWith($this->horizonServer->getSigningProvider());
 
