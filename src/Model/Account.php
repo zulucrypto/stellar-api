@@ -46,6 +46,16 @@ class Account extends RestApiModel
     {
         $rawData = $response->getRawData();
 
+        // 404 means the account does not currently exist (it may have been merged)
+        if (isset($rawData['status']) && $rawData['status'] == 404) {
+            throw new \InvalidArgumentException('Account does not exist');
+        }
+
+        // Generic catch for other errors
+        if (isset($rawData['status']) && $rawData['status'] !== 200) {
+            throw new \InvalidArgumentException('Cannot create account due to error response');
+        }
+
         $object = new Account($rawData['id']);
 
         $object->accountId = $rawData['account_id'];
