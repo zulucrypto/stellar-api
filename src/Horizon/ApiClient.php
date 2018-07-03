@@ -95,6 +95,7 @@ class ApiClient
         $this->baseUrl = $baseUrl;
         $this->httpClient = new Client([
             'base_uri' => $baseUrl,
+            'exceptions' => false,
         ]);
         $this->networkPassphrase = $networkPassphrase;
     }
@@ -185,7 +186,7 @@ class ApiClient
             $decoded = null;
             if ($e->getResponse()) {
                 $decoded = Json::mustDecode($e->getResponse()->getBody());
-                throw HorizonException::fromRawResponse($relativeUrl, 'GET', $decoded);
+                throw HorizonException::fromRawResponse($relativeUrl, 'GET', $decoded, $e);
             }
             // No response, something else went wrong
             else {

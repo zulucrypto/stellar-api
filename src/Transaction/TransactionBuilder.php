@@ -518,13 +518,31 @@ class TransactionBuilder implements XdrEncodableInterface
     {
         $this->ensureApiClient();
 
+        $account = $this->apiClient
+            ->getAccount($this->accountId->getAccountIdString());
+
+        if (!$account) {
+            throw new \ErrorException(sprintf('Account not found: %s', $this->accountId->getAccountIdString()));
+        }
+
         try {
             return $this->apiClient
                     ->getAccount($this->accountId->getAccountIdString())
                     ->getSequence() + 1
                 ;
         } catch (HorizonException $e) {
-            throw new \ErrorException(sprintf('Could not get sequence number for %s, does this account exist?', $this->accountId->getAccountIdString()));
+            $e->getTraceAsString();
+
+            print "**************\n" . $e->getTraceAsString() . "\n****************\n";
+
+            throw new \ErrorException(
+                sprintf('Could not get sequence number for %s, does this account exist?', $this->accountId->getAccountIdString()),
+                $e->getCode(),
+                $e->getSeverity(),
+                __FILE__,
+                __LINE__,
+                $e
+            );
         }
     }
 

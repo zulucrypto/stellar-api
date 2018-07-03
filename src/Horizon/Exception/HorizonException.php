@@ -121,7 +121,7 @@ class HorizonException extends \ErrorException
      */
     public function __construct($title, Throwable $previous = null)
     {
-        parent::__construct($title, 0, 1, __FILE__, __LINE__, $previous);
+        parent::__construct($title, 0, 1, $previous->getFile(), $previous->getLine(), $previous);
     }
 
     /**
