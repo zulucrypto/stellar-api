@@ -190,6 +190,20 @@ class Keypair
     }
 
     /**
+     * Returns the raw bytes of the checksum for the public key
+     *
+     * @return string
+     */
+    public function getPublicKeyChecksum()
+    {
+        $checksumBytes = substr($this->getPublicKeyBytes(), -2);
+
+        $unpacked = unpack('v', $checksumBytes);
+
+        return array_shift($unpacked);
+    }
+
+    /**
      * Returns the base-32 encoded private key (S...)
      * @return string
      * @throws \ErrorException
