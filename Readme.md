@@ -68,6 +68,19 @@ back to a decimal number when you need to display a balance to the user.
 
 The static `StellarAmount::STROOP_SCALE` property can be used to help with this conversion.
 
+## Installation
+
+To install the latest release for usage in your project:
+
+	cd your_project/
+	composer require zulucrypto/stellar-api
+
+If you want to work with the most recent development version you can use this repository:
+
+	git clone https://github.com/zulucrypto/stellar-api.git
+	cd stellar-api/
+	composer install
+
 ## Getting Started
 
 See the [getting-started](getting-started/) directory for examples of how to use this library.
