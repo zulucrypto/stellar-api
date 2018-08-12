@@ -1,3 +1,11 @@
+### 0.6.4
+
+Maintenance release
+
+ * TransactionBuilder setMemo() now returns the TransactionBuilder
+ * Improved error reporting and error messages
+ * Fixed stream payments example
+
 ### 0.6.3
 
 Added support for [BumpSequenceOp](https://github.com/stellar/stellar-protocol/issues/53)
