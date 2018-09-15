@@ -35,7 +35,7 @@ class ApiClient
     /**
      * @var Client
      */
-    private $httpClient;
+    public $httpClient;
 
     /**
      * @var string
