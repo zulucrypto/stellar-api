@@ -1,3 +1,13 @@
+### 0.7.0
+
+ * Additional support for BumpSequenceOp: it is now read correctly when listing operations
+ * Convenience method for checking if an account is valid: `Account::isValidAccount`
+ * Convenience method for checking if an account exists on the network (is funded): `Server::accountExists`
+ * `getTransactionHash()` is now supported on all operations (if Horizon includes it in the response)
+ * HTTP Client can now be retrieved and overridden for testing or if you want to use a custom one
+ * `TransactionBuilder` now always uses a `BigInteger` internally when working with account sequence numbers
+ * Reduced the number of times an API call is made to Horizon to get the account's sequence number. Thanks to @rhysied for pointing out this issue! 
+
 ### 0.6.4
 
 Maintenance release
