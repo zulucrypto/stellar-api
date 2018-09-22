@@ -24,6 +24,10 @@ class Account extends RestApiModel
 
     private $accountId;
 
+    /**
+     * NOTE: for the BigInteger representation of this, see $this->getSequenceAsBigInteger()
+     * @var string
+     */
     private $sequence;
 
     private $subentryCount;
@@ -376,9 +380,25 @@ class Account extends RestApiModel
         return $this->thresholds;
     }
 
+    /**
+     * This returns the sequence exactly as it comes back from the Horizon API
+     *
+     * See getSequenceAsBigInteger if you need to use this value in a transaction
+     * or other 64-bit safe location.
+     *
+     * @return string
+     */
     public function getSequence()
     {
         return $this->sequence;
+    }
+
+    /**
+     * @return BigInteger
+     */
+    public function getSequenceAsBigInteger()
+    {
+        return new BigInteger($this->sequence);
     }
 
     /**
