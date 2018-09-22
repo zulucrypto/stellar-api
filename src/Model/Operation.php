@@ -46,6 +46,11 @@ class Operation extends RestApiModel
     protected $typeI;
 
     /**
+     * @var string
+     */
+    protected $transactionHash;
+
+    /**
      * @param array $rawData
      * @return Operation
      */
@@ -120,6 +125,7 @@ class Operation extends RestApiModel
         $this->typeI = $rawData['type_i'];
 
         if (isset($rawData['paging_token'])) $this->pagingToken = $rawData['paging_token'];
+        if (isset($rawData['transaction_hash'])) $this->transactionHash = $rawData['transaction_hash'];
     }
 
     /**
@@ -168,5 +174,13 @@ class Operation extends RestApiModel
     public function setTypeI($typeI)
     {
         $this->typeI = $typeI;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTransactionHash()
+    {
+        return $this->transactionHash;
     }
 }
