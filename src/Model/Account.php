@@ -6,6 +6,7 @@ namespace ZuluCrypto\StellarSdk\Model;
 
 use phpseclib\Math\BigInteger;
 use ZuluCrypto\StellarSdk\Horizon\Api\HorizonResponse;
+use ZuluCrypto\StellarSdk\Keypair;
 use ZuluCrypto\StellarSdk\Transaction\TransactionBuilder;
 use ZuluCrypto\StellarSdk\Util\MathSafety;
 use ZuluCrypto\StellarSdk\XdrModel\Asset;
@@ -84,6 +85,27 @@ class Account extends RestApiModel
         }
 
         return $object;
+    }
+
+    /**
+     * Returns true if the specified account ID (G....) passes basic validity checks
+     *
+     * Note that this doesn't necessarily mean the account is funded or exists
+     * on the network. To check that, use the Server::getAccount() method.
+     *
+     * @param $accountId
+     * @return bool
+     */
+    public static function isValidAccount($accountId)
+    {
+        // Validate that keypair passes checksum
+        try {
+            $keypair = Keypair::newFromPublicKey($accountId);
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        return true;
     }
 
     public function __construct($id)
