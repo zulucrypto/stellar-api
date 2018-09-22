@@ -75,6 +75,9 @@ class OperationResult
             case Operation::TYPE_MANAGE_DATA:
                 return ManageDataResult::fromXdr($xdr);
                 break;
+            case Operation::TYPE_BUMP_SEQUENCE:
+                return BumpSequenceResult::fromXdr($xdr);
+                break;
             default:
                 throw new \ErrorException(sprintf('Unknown operation type: %s', $opType));
         }
