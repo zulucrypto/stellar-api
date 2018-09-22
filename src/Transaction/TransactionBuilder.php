@@ -380,12 +380,8 @@ class TransactionBuilder implements XdrEncodableInterface
     {
         $bytes = '';
 
-        // todo: $sequenceNumber should always be a BigInteger
-        if ($this->sequenceNumber) {
-            $sequenceNumber = $this->sequenceNumber->toString();
-        }
-        else {
-            $sequenceNumber = $this->generateSequenceNumber();
+        if (!$this->sequenceNumber) {
+            $this->sequenceNumber = $this->generateSequenceNumber();
         }
 
         // Account ID (36 bytes)
@@ -393,7 +389,7 @@ class TransactionBuilder implements XdrEncodableInterface
         // Fee (4 bytes)
         $bytes .= XdrEncoder::unsignedInteger($this->getFee());
         // Sequence number (8 bytes)
-        $bytes .= XdrEncoder::unsignedInteger64($sequenceNumber);
+        $bytes .= XdrEncoder::unsignedBigInteger64($this->sequenceNumber);
 
         // Time Bounds are optional
         if ($this->timeBounds->isEmpty()) {
@@ -525,25 +521,7 @@ class TransactionBuilder implements XdrEncodableInterface
             throw new \ErrorException(sprintf('Account not found: %s', $this->accountId->getAccountIdString()));
         }
 
-        try {
-            return $this->apiClient
-                    ->getAccount($this->accountId->getAccountIdString())
-                    ->getSequence() + 1
-                ;
-        } catch (HorizonException $e) {
-            $e->getTraceAsString();
-
-            print "**************\n" . $e->getTraceAsString() . "\n****************\n";
-
-            throw new \ErrorException(
-                sprintf('Could not get sequence number for %s, does this account exist?', $this->accountId->getAccountIdString()),
-                $e->getCode(),
-                $e->getSeverity(),
-                __FILE__,
-                __LINE__,
-                $e
-            );
-        }
+        return $account->getSequenceAsBigInteger()->add(new BigInteger(1));
     }
 
     protected function ensureApiClient()
@@ -601,6 +579,10 @@ class TransactionBuilder implements XdrEncodableInterface
      */
     public function setSequenceNumber($sequenceNumber)
     {
+        if (!is_a($sequenceNumber, 'phpseclib\Math\BigInteger')) {
+            $sequenceNumber = new BigInteger($sequenceNumber);
+        }
+
         $this->sequenceNumber = $sequenceNumber;
 
         return $this;
