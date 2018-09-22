@@ -35,22 +35,22 @@ class ApiClient
     /**
      * @var Client
      */
-    private $httpClient;
+    protected $httpClient;
 
     /**
      * @var string
      */
-    private $baseUrl;
+    protected $baseUrl;
 
     /**
      * @var boolean
      */
-    private $isTestnet;
+    protected $isTestnet;
 
     /**
      * @var string
      */
-    private $networkPassphrase;
+    protected $networkPassphrase;
 
     /**
      * @return ApiClient
@@ -539,4 +539,21 @@ class ApiClient
     {
         $this->baseUrl = $baseUrl;
     }
+
+    /**
+     * @return Client
+     */
+    public function getHttpClient()
+    {
+        return $this->httpClient;
+    }
+
+    /**
+     * @param Client $httpClient
+     */
+    public function setHttpClient($httpClient)
+    {
+        $this->httpClient = $httpClient;
+    }
+
 }
