@@ -3,6 +3,7 @@
 namespace ZuluCrypto\StellarSdk;
 
 
+use phpseclib\Math\BigInteger;
 use Prophecy\Exception\InvalidArgumentException;
 use ZuluCrypto\StellarSdk\Horizon\ApiClient;
 use ZuluCrypto\StellarSdk\Horizon\Exception\HorizonException;
@@ -102,6 +103,29 @@ class Server
         $account->setApiClient($this->apiClient);
 
         return $account;
+    }
+
+    /**
+     * Returns true if the account exists on this server and has been funded
+     *
+     * @param $accountId
+     * @return bool
+     * @throws HorizonException
+     * @throws \ErrorException
+     */
+    public function accountExists($accountId)
+    {
+        // Handle basic errors such as malformed account IDs
+        try {
+            $account = $this->getAccount($accountId);
+        } catch (\InvalidArgumentException $e) {
+            return false;
+        }
+
+        // Account ID may be valid but hasn't been funded yet
+        if (!$account) return false;
+
+        return $account->getNativeBalanceStroops() != '0';
     }
 
     /**
