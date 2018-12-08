@@ -54,9 +54,9 @@ class TransactionEnvelope implements XdrEncodableInterface
      * @return TransactionEnvelope
      * @throws \ErrorException
      */
-    public static function fromXdr(XdrBuffer $xdr)
+    public static function fromXdr(XdrBuffer $xdr, Server $server = null)
     {
-        $builder = Transaction::fromXdr($xdr)->toTransactionBuilder();
+        $builder = Transaction::fromXdr($xdr)->toTransactionBuilder($server);
 
         $model = new TransactionEnvelope($builder);
 
