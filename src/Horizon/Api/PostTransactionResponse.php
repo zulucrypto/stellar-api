@@ -43,6 +43,9 @@ class PostTransactionResponse extends HorizonResponse
         if (!empty($rawData['result_xdr'])) {
             $xdr = new XdrBuffer(base64_decode($rawData['result_xdr']));
             $this->result = TransactionResult::fromXdr($xdr);
+        }  else if (!empty($rawData['extras']['result_xdr'])) {
+            $xdr = new XdrBuffer(base64_decode($rawData['extras']['result_xdr']));
+            $this->result = TransactionResult::fromXdr($xdr);
         }
     }
 
