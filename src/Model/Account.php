@@ -163,7 +163,7 @@ class Account extends RestApiModel
      * @param int  $limit
      * @return Transaction[]
      */
-    public function getTransactions($sinceCursor = null, $limit = 50)
+    public function getTransactions($sinceCursor = null, $limit = 50, $order = 'asc')
     {
         $transactions = [];
 
@@ -172,6 +172,7 @@ class Account extends RestApiModel
 
         if ($sinceCursor) $params['cursor'] = $sinceCursor;
         if ($limit) $params['limit'] = $limit;
+        if ($order) $params['order'] = $order;
 
         if ($params) {
             $url .= '?' . http_build_query($params);
